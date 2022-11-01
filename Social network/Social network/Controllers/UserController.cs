@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.Models;
 using Services;
 using Social_network.Models;
 using Social_network.ViewModels;
@@ -15,10 +16,12 @@ namespace Social_network.Controllers
     public class UserController : Controller
     {
         private readonly UserService _userService;
+        private readonly PostService _postService;
 
-        public UserController(UserService userService)
+        public UserController(UserService userService, PostService postService)
         {
             _userService = userService;
+            _postService = postService;
         }
 
         //Get:User/UserPage/id
@@ -30,34 +33,75 @@ namespace Social_network.Controllers
             {
                 return NotFound();
             }
+            UserViewModel model = new UserViewModel();
 
-            return View(ToViewModel(User));
+            model.Id = id;
+            model.Name = User.Name;
+            model.Notes = User.Notes;
+            model.PhoneNumber = User.PhoneNumber;
+            model.Surname = User.Surname;
+            model.AvatarURL = User.AvatarURL;
+            model.Posts = new List<PostViewModel>();
+
+            var NotSortedAllPosts = _postService.GetAllPosts();
+            var AllPosts = from s in NotSortedAllPosts
+                          orderby s.PostTime descending
+                           select s;
+
+            foreach(var post in AllPosts)
+            {
+                if (post.UserId == id)
+                {
+                    model.Posts.Add(new PostViewModel()
+                    {
+                        Id = post.Id,
+                        UserId = post.UserId,
+                        Text = post.Text,
+                        PostTime = post.PostTime
+                    });
+                }
+            }
+
+            return View(model);
         }
 
-        private UserViewModel ToViewModel(User user)
+        //Post post
+        [HttpPost]
+        public IActionResult Send (UserViewModel sendpost)
         {
-            return new UserViewModel()
+            if (sendpost.NewPost.Text == null)
             {
-                Id = user.Id,
-                AvatarURL = user.AvatarURL,
-                BirthDate = user.BirthDate,
-                Name = user.Name,
-                Notes = user.Notes,
-                PhoneNumber = user.PhoneNumber,
-                Surname = user.Surname
-            };
+                return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
+            }
+            else
+            {
+                sendpost.NewPost.PostTime = DateTime.Now;
+                sendpost.NewPost.UserId = sendpost.Id;
+                _postService.CreatePost(ToModel(sendpost.NewPost));
+                return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
+            }
         }
-        private User ToModel(UserViewModel userView)
+
+        //private UserViewModel ToViewModel(User user)
+        //{
+        //    return new UserViewModel()
+        //    {
+        //        Id = user.Id,
+        //        AvatarURL = user.AvatarURL,
+        //        BirthDate = user.BirthDate,
+        //        Name = user.Name,
+        //        Notes = user.Notes,
+        //        PhoneNumber = user.PhoneNumber,
+        //        Surname = user.Surname
+        //    };
+        //}
+        private Post ToModel(Post postView)
         {
-            return new User()
+            return new Post()
             {
-                BirthDate = userView.BirthDate,
-                Surname = userView.Surname,
-                PhoneNumber = userView.PhoneNumber,
-                AvatarURL = userView.AvatarURL,
-                Id = userView.Id,
-                Name = userView.Name,
-                Notes = userView.Notes
+                 PostTime=postView.PostTime,
+                  Text = postView.Text,
+                   UserId = postView.UserId
             };
         }
     }
