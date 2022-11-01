@@ -1,9 +1,12 @@
+using Data_SocialNetwork.EF;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Models;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +26,12 @@ namespace Social_network
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<RepositoryOptions>(Configuration);
+            services.AddDbContext<SocialNetworkContext>();
+            services.AddScoped<UserService>();
+
+            services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(SocialNetworkRepository<>)));
+
             services.AddControllersWithViews();
         }
 
@@ -50,7 +59,8 @@ namespace Social_network
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=User}/{action=UserPage}/{id=1}");
+                //pattern: "{controller}/{action}/{id?}");
             });
         }
     }

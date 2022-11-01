@@ -1,0 +1,72 @@
+﻿@model Social_network.ViewModels.UserViewModel
+
+<form asp-action="Send">
+
+    <div class="form-horizontal">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <h4>Chat: @Model.Name</h4>
+            <header class="navbar navbar-expand-sm navbar-light bg-white border-bottom">
+                <div class="container">
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                Accounts:
+                            </li>
+                            @for (var j = 0; j < 3; j++)
+                            {
+
+                                    <li class="nav-item">
+                                        Че? |
+                                    </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </header>
+        </nav>
+        @Html.HiddenFor(m => Model.Id)
+        <div class="container">
+            <table border-collapse="collaps">
+                <tr>
+                    <td class="align-top">
+                        <table class="table table-bordered" style="border-collapse:separate">
+
+                            <tr>
+                                <td bgcolor="#D3EDF6" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Моя страница</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Друзья</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Лента новостей</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Сообщения</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Группы</a>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                    <td width="100%" style="vertical-align:top">
+                        <table class="table">
+
+                            
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>
