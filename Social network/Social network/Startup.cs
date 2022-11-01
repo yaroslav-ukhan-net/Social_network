@@ -29,6 +29,7 @@ namespace Social_network
             services.Configure<RepositoryOptions>(Configuration);
             services.AddDbContext<SocialNetworkContext>();
             services.AddScoped<UserService>();
+            services.AddScoped<PostService>();
 
             services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(SocialNetworkRepository<>)));
 

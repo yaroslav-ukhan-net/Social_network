@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Models;
+using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,6 @@ namespace Data_SocialNetwork.EF
         }
 
         public DbSet<User> Users { get; set; }
-        //public DbSet<Chat> Chats { get; set; }
+        public DbSet<Post> Posts { get; set; }
     }
 }
