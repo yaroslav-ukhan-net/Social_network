@@ -5,4 +5,9 @@
     <RootNamespace>Social_network</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Data_SocialNetwork.EF\Data_SocialNetwork.EF.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
+  </ItemGroup>
+
 </Project>
