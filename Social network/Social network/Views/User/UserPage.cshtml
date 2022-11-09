@@ -2,78 +2,39 @@
 
 <form asp-action="Send">
 
-    <div class="form-horizontal">
-        @Html.HiddenFor(m => Model.Id)
-        <div class="container">
-            <table border-collapse="collaps">
-                <tr>
-                    <td class="align-top">
-                        <table class="table table-bordered" style="border-collapse:separate">
+@Html.HiddenFor(m => Model.Id)
 
-                            <tr>
-                                <td bgcolor="#D3EDF6" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Главная</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Лента</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Сообщения</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Группы</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="Chats" asp-route-id="@Model.Id">Друзья</a>
-                                </td>
-                            </tr>
+    <table class="table">
+        <tr>
+            <td style="padding:0px" width="210px">
+                <div>
+                    <img src="@Model.AvatarURL" width="200" />
+                </div>
+            </td>
+            <td bgcolor="#D3EDF6" style="padding:20px">
+                <div>
+                    @Model.Name @Model.Surname<br style="padding:20px">
+                    День рождения : @Model.BirthDate.ToString("d")<br style="padding:20px">
+                    Номер телефона : @Model.PhoneNumber<br>
+                    О себе : @Model.Notes
+                </div>
+            </td>
+        </tr>
+    </table>
+    <nav>
+        Опубликуйте новость:
+        <input type="text" asp-for="NewPost.Text" />
+        <input type="hidden" asp-for="NewPost.UserId" />
+        <input type="submit" value="Отправить пост" class="btn btn-primary" />
+        @foreach (var post in Model.Posts)
+        {
+            <nav>
+                @Model.Name @Model.Surname <img src="@Model.AvatarURL" width="15" /> <sub>(@post.PostTime.ToString("g"))</sub><br />
+                <div style="border: solid; padding:10px">
+                    @post.Text
+                </div>
+            </nav><br />
+        }
+    </nav>
 
-                        </table>
-                    </td>
-                    <td width="100%" style="vertical-align:top">
-                        <table class="table">
-                            <tr>
-                                <td style="padding:0px" width="210px">
-                                    <div>
-                                        <img src="@Model.AvatarURL" width="200" />
-                                    </div>
-                                </td>
-                                <td bgcolor="#D3EDF6" style="padding:20px">
-                                    <div>
-                                        @Model.Name @Model.Surname<br style="padding:20px">
-                                        День рождения : @Model.BirthDate.ToString("d")<br style="padding:20px">
-                                        Номер телефона : @Model.PhoneNumber<br>
-                                        О себе : @Model.Notes
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <nav>
-                            Опубликуйте новость:
-                            <input type="text" asp-for="NewPost.Text" />
-                            <input type="hidden" asp-for="NewPost.UserId" />
-                            <input type="submit" value="Отправить пост" class="btn btn-primary" />
-                            @foreach (var post in Model.Posts)
-                            {
-                                <nav>
-                                    @Model.Name @Model.Surname <img src="@Model.AvatarURL" width="15" /> <sub>(@post.PostTime.ToString("g"))</sub><br />
-                                    <div style="border: solid; padding:10px">
-                                        @post.Text
-                                    </div>
-                                </nav><br />
-                            }
-                        </nav>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
 </form>

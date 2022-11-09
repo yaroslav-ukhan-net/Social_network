@@ -1,0 +1,66 @@
+﻿@model Social_network.ViewModels.UserAddFriendsViewModel
+
+<nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 navbar-expand-md">
+    <div class="container">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends" asp-route-id="@Model.Id">Мои друзья</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends" asp-route-id="@Model.Id">Отправленные заявки</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends" asp-route-id="@Model.Id">Полученные заявки</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends" asp-route-id="@Model.Id">Добавить друга</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div>Добавить друга</div>
+<nav>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Avatar
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Surname
+                </th>
+                <th>
+                    Pnome number
+                </th>
+            </tr>
+        </thead>
+        @foreach (var friend in Model.AddFriendForModel)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="@friend.AvatarURL" width="15" />
+                    </td>
+                    <td>
+                        @friend.Name
+                    </td>
+                    <td>
+                        @friend.Surname
+                    </td>
+                    <td>
+                        @friend.PhoneNumber
+                    </td>
+                    <td>
+                        @Html.ActionLink("Запрос в друзья", "AddFriend", new { UserSender = Model.Id , UserRequest = friend.UserId})
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</nav>
