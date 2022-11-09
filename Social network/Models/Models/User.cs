@@ -2,6 +2,7 @@
 using Models.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
@@ -15,6 +16,8 @@ namespace Models
         public string PhoneNumber { get; set; }
         public string Notes { get; set; }
         public virtual List<Post> posts { get; set; }
+        public virtual List<Friend> Friend_ones { get; set; }
+        public virtual List<Friend> Friend_twos { get; set; }
         //public virtual List<Group> Groups { get; set; } = new List<Group>();
         //public virtual List<Chat> Chats { get; set; } = new List<Chat>(); 
     }

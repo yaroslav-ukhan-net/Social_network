@@ -35,11 +35,15 @@ namespace Data_SocialNetwork.EF
         {
             return DbSet.Find(id);
         }
+        public T GetByTwoId(int id,int id2)
+        {
+            return DbSet.Find(id,id2);
+        }
 
         public void Remove(int id)
         {
             var entity = GetById(id);
-            Remove(entity);
+            RemoveEntity(entity);
         }
 
         public void Update(T entity)
@@ -47,7 +51,7 @@ namespace Data_SocialNetwork.EF
             DbSet.Update(entity);
             _context.SaveChanges();
         }
-        public void Remove(T entity)
+        public void RemoveEntity(T entity)
         {
             DbSet.Remove(entity);
             _context.SaveChanges();

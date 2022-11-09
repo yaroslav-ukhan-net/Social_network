@@ -13,5 +13,7 @@ namespace Models
         void Remove(int id);
         TEntity Create(TEntity entity);
         void Update(TEntity entity);
+        void RemoveEntity(TEntity entity);
+        TEntity GetByTwoId(int id,int id2);
     }
 }

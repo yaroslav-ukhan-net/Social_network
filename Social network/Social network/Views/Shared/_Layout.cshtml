@@ -11,7 +11,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="User" asp-action="MyPage">Social_network</a>
+                <a class="navbar-brand" asp-area="" asp-controller="User" asp-action="UserPage" asp-route-id="1">Social_network</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -28,7 +28,49 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            @RenderBody()
+            <div class="form-horizontal">
+
+                <div class="container">
+                    <table border-collapse="collaps">
+                        <tr>
+                            <td class="align-top">
+                                <table class="table table-bordered" style="border-collapse:separate">
+
+                                    <tr>
+                                        <td bgcolor="#D3EDF6" style="padding:0px">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="UserPage" asp-route-id="1">Главная</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="alert-dark" style="padding:0px">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Лента</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="alert-dark" style="padding:0px">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Сообщения</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="alert-dark" style="padding:0px">
+                                            <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Группы</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="alert-dark" style="padding:0px">
+                                            <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends" asp-route-id="1">Друзья</a>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </td>
+                            <td width="100%" style="vertical-align:top">
+                                @RenderBody()
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </main>
     </div>
 
