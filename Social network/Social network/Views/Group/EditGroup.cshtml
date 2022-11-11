@@ -1,0 +1,33 @@
+﻿@model Social_network.ViewModels.GroupsViewModel
+
+<form asp-action="CreateGroup">
+    <div>
+        <h4>Create new Group</h4>
+        <hr />
+        <input type="hidden" asp-for="GroupAdminId" />
+        <div class="form-group">
+            <label asp-for="GroupName" class="col-lg-2 col-form-label"></label>
+            <div class="col-md-10">
+                <input asp-for="GroupName" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="GroupAvatarURL" class="col-lg-3 col-form-label-lg"></label>
+            <div class="col-md-11">
+                <input asp-for="GroupAvatarURL" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="GroupNotes" class="col-lg-3 col-form-label-lg"></label>
+            <div class="col-md-11">
+                <input asp-for="GroupNotes" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-4">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+</form>

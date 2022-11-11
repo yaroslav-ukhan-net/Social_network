@@ -1,8 +1,6 @@
 ﻿@model Social_network.ViewModels.UserViewModel
 
-<form asp-action="Send">
 
-@Html.HiddenFor(m => Model.Id)
 
     <table class="table">
         <tr>
@@ -16,25 +14,29 @@
                     @Model.Name @Model.Surname<br style="padding:20px">
                     День рождения : @Model.BirthDate.ToString("d")<br style="padding:20px">
                     Номер телефона : @Model.PhoneNumber<br>
-                    О себе : @Model.Notes
+                    О себе : @Model.Notes<br />
+                    <a class="nav-link text-dark, border-dark" asp-controller="User" asp-action="EditMyInformation" asp-route-id="@Model.Id">Редактировать мою информацию</a>
                 </div>
             </td>
         </tr>
     </table>
     <nav>
-        Опубликуйте новость:
-        <input type="text" asp-for="NewPost.Text" />
-        <input type="hidden" asp-for="NewPost.UserId" />
-        <input type="submit" value="Отправить пост" class="btn btn-primary" />
-        @foreach (var post in Model.Posts)
-        {
-            <nav>
-                @Model.Name @Model.Surname <img src="@Model.AvatarURL" width="15" /> <sub>(@post.PostTime.ToString("g"))</sub><br />
-                <div style="border: solid; padding:10px">
-                    @post.Text
-                </div>
-            </nav><br />
-        }
+        <form asp-action="Send">
+
+            @Html.HiddenFor(m => Model.Id)
+            Опубликуйте новость:
+            <input type="text" asp-for="NewPost.Text" />
+            <input type="hidden" asp-for="NewPost.UserId" />
+            <input type="submit" value="Отправить пост" class="btn btn-primary" />
+            @foreach (var post in Model.Posts)
+            {
+                <nav>
+                    @Model.Name @Model.Surname <img src="@Model.AvatarURL" width="15" /> <sub>(@post.PostTime.ToString("g"))</sub><br />
+                    <div style="border: solid; padding:10px">
+                        @post.Text
+                    </div>
+                </nav><br />
+            }
+        </form>
     </nav>
 
-</form>
