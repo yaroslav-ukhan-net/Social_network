@@ -42,6 +42,7 @@ namespace Social_network.Controllers
             model.Surname = User.Surname;
             model.AvatarURL = User.AvatarURL;
             model.Posts = new List<PostViewModel>();
+            
 
             var NotSortedAllPosts = _postService.GetAllPosts();
             var AllPosts = from s in NotSortedAllPosts
@@ -82,19 +83,33 @@ namespace Social_network.Controllers
             }
         }
 
-        //private UserViewModel ToViewModel(User user)
-        //{
-        //    return new UserViewModel()
-        //    {
-        //        Id = user.Id,
-        //        AvatarURL = user.AvatarURL,
-        //        BirthDate = user.BirthDate,
-        //        Name = user.Name,
-        //        Notes = user.Notes,
-        //        PhoneNumber = user.PhoneNumber,
-        //        Surname = user.Surname
-        //    };
-        //}
+        [HttpGet]
+        public IActionResult EditMyInformation(int id)
+        {
+            var MyUserInformation = _userService.GetUserById(id);
+            return View(ToViewModel(MyUserInformation));
+        }
+
+        [HttpPost]
+        public IActionResult EditMyInformation(UserViewModel userView)
+        {
+            _userService.UpdateUser(ToModel(userView));
+            return RedirectToAction("UserPage");
+        }
+
+        private UserViewModel ToViewModel(User user)
+        {
+            return new UserViewModel()
+            {
+                Id = user.Id,
+                AvatarURL = user.AvatarURL,
+                BirthDate = user.BirthDate,
+                Name = user.Name,
+                Notes = user.Notes,
+                PhoneNumber = user.PhoneNumber,
+                Surname = user.Surname
+            };
+        }
         private Post ToModel(Post postView)
         {
             return new Post()
@@ -102,6 +117,19 @@ namespace Social_network.Controllers
                  PostTime=postView.PostTime,
                   Text = postView.Text,
                    UserId = postView.UserId
+            };
+        }
+        private User ToModel(UserViewModel userView)
+        {
+            return new User()
+            {
+                Id = userView.Id,
+                AvatarURL = userView.AvatarURL,
+                BirthDate = userView.BirthDate,
+                Name = userView.Name,
+                PhoneNumber = userView.PhoneNumber,
+                Surname = userView.Surname,
+                Notes = userView.Notes
             };
         }
     }

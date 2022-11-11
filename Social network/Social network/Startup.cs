@@ -32,6 +32,7 @@ namespace Social_network
             services.AddScoped<UserService>();
             services.AddScoped<PostService>();
             services.AddScoped<FriendService>();
+            services.AddScoped<GroupService>();
 
             services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(SocialNetworkRepository<>)));
 

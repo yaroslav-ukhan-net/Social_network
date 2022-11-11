@@ -18,12 +18,4 @@ namespace Social_network.ViewModels
         public Post NewPost { get; set; }
         public List<PostViewModel> Posts { get; set; }
     }
-
-    public class PostViewModel
-    {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public string Text { get; set; }
-        public DateTime PostTime { get; set; }
-    }
 }

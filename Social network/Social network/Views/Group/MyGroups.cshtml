@@ -1,0 +1,79 @@
+﻿@model Social_network.ViewModels.UserGroupsViewModel
+
+<nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 navbar-expand-md">
+    <div class="container">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups" asp-route-id="@Model.Id">Мои группы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="NewGroups" asp-route-id="@Model.Id">Новые группы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="CreateGroup" asp-route-id="@Model.Id">Создать группу</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="AddFreeFriends" asp-route-id="@Model.Id">---------------</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div>@ViewData["PageName"]</div>
+<nav>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Avatar
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Кол-во подписчиков
+                </th>
+                <th>
+                    Дата создания
+                </th>
+                <th>
+                    Описание
+                </th>
+            </tr>
+        </thead>
+        @foreach (var group in Model.Groups)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="@group.GroupAvatarURL" width="15" />
+                    </td>
+                    <td>
+                        @group.GroupName
+                    </td>
+                    <td>
+                        @group.GroupCountFollowers
+                    </td>
+                    <td>
+                        @group.GroupCreateDate
+                    </td>
+                    <td>
+                        @group.GroupNotes
+                    </td>
+                    <td>
+                        @if (ViewData["PageName"].ToString() == "MyGroups")
+                        {
+                            @Html.ActionLink("Отписаться", "DeleteGroup", new { MyUserId = Model.Id, DeleteGroup = group.GroupId })
+                        }
+                        @if (ViewData["PageName"].ToString() == "NewGroups")
+                        {
+                            @Html.ActionLink("Отправить заявку", "AddGroup", new { MyUserId = Model.Id, AddGroupId = group.GroupId })
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</nav>

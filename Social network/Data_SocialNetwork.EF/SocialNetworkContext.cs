@@ -39,16 +39,21 @@ namespace Data_SocialNetwork.EF
                 .WithMany(mu => mu.Friend_twos)
                 .HasForeignKey(f => f.Friend_twoId);
 
-
-            //modelBuilder.Entity<Friend>()
-            //       .HasOne(pt => pt.Friend_two)
-            //       .WithMany(p => p.Friends)
-            //       .HasForeignKey(pt => pt.Friend_twoId)
-            //       .OnDelete(DeleteBehavior.NoAction);
-
+            modelBuilder.Entity<UserGroup>()
+                .HasKey(bc => new { bc.UserId, bc.GroupId });
+            modelBuilder.Entity<UserGroup>()
+                .HasOne(ug => ug.User)
+                .WithMany(u => u.UserGroup)
+                .HasForeignKey(ug => ug.UserId);
+            modelBuilder.Entity<UserGroup>()
+                .HasOne(ug => ug.Group)
+                .WithMany(g => g.UserGroup)
+                .HasForeignKey(ug => ug.GroupId);
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Friend> Friends { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<UserGroup> UserGroup { get; set; }
     }
 }
