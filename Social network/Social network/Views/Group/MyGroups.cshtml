@@ -15,7 +15,7 @@
                     <a class="nav-link text-dark" asp-controller="Group" asp-action="CreateGroup" asp-route-id="@Model.Id">Создать группу</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Group" asp-action="AddFreeFriends" asp-route-id="@Model.Id">---------------</a>
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="AddFreeFriends" asp-route-id="@Model.Id">------</a>
                 </li>
             </ul>
         </div>
@@ -33,7 +33,7 @@
                     Name
                 </th>
                 <th>
-                    Кол-во подписчиков
+                    Подписчиков
                 </th>
                 <th>
                     Дата создания
@@ -51,7 +51,7 @@
                         <img src="@group.GroupAvatarURL" width="15" />
                     </td>
                     <td>
-                        @group.GroupName
+                        @Html.ActionLink(@group.GroupName, "GroupPage", new { UserId = Model.Id, GroupPageId = group.GroupId })
                     </td>
                     <td>
                         @group.GroupCountFollowers
@@ -63,13 +63,17 @@
                         @group.GroupNotes
                     </td>
                     <td>
-                        @if (ViewData["PageName"].ToString() == "MyGroups")
-                        {
-                            @Html.ActionLink("Отписаться", "DeleteGroup", new { MyUserId = Model.Id, DeleteGroup = group.GroupId })
-                        }
                         @if (ViewData["PageName"].ToString() == "NewGroups")
                         {
-                            @Html.ActionLink("Отправить заявку", "AddGroup", new { MyUserId = Model.Id, AddGroupId = group.GroupId })
+                            if (group.IsClose)
+                            {
+                                @Html.ActionLink("Отправить заявку", "AddGroup", new { MyUserId = Model.Id, AddGroupId = group.GroupId })
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Подписаться", "AddGroup", new { MyUserId = Model.Id, AddGroupId = group.GroupId })
+                            }
+
                         }
                     </td>
                 </tr>

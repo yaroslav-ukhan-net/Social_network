@@ -1,0 +1,59 @@
+﻿@model Social_network.ViewModels.GroupsViewModel
+
+<table class="table">
+    <tr>
+        <td style="padding:0px" width="210px">
+            <div>
+                <img src="@Model.GroupAvatarURL" width="200" />
+            </div>
+        </td>
+        <td bgcolor="#D3EDF6" style="padding:20px">
+            <div>
+                @Model.GroupName <br style="padding:20px">
+                @if (Model.IsClose)
+                {
+                    <nav>Это закрытая группа</nav>
+                }
+                else
+                {
+                    <nav>
+                        Это открытая группа
+                    </nav>
+                }
+                Дета создания : @Model.GroupCreateDate.ToString("d")<br style="padding:20px">
+                Кол-во подписчиков : @Model.GroupCountFollowers<br>
+                Описание : @Model.GroupNotes<br />
+                @if (Model.Id == Model.GroupAdminId)
+                {
+                    <a class="nav-link text-dark, border-dark" asp-controller="Group" asp-action="EditGroup" asp-route-id="@Model.GroupId">Редактировать группу</a>
+                    <a class="nav-link text-dark, border-dark" asp-controller="Group" asp-action="DeleteGroup" asp-route-id="@Model.GroupId">Удалить группу</a>
+                }
+                else
+                {
+                    <a class="nav-link text-dark, border-dark" asp-controller="Group" asp-action="UnsubscribeFromGroup" asp-route-id="@Model.GroupId">Отписаться</a>
+                    <a class="nav-link text-dark, border-dark" asp-controller="Group" asp-action="RequestJoinGroup" asp-route-id="@Model.GroupId">Отправить запрос в группу</a>
+                }
+
+            </div>
+        </td>
+    </tr>
+</table>
+<nav>
+    <form asp-action="Send">
+
+        @Html.HiddenFor(m => Model.Id)
+        Опубликуйте новость:
+        <input type="text" asp-for="NewPost.Text" />
+        <input type="hidden" asp-for="NewPost.UserId" />
+        <input type="submit" value="Отправить пост" class="btn btn-primary" />
+        @foreach (var post in Model.Posts)
+        {
+            <nav>
+                @post.PostSenderName <img src="@post.PostSenderAvatar." width="15" /> <sub>(@post.PostTime.ToString("g"))</sub><br />
+                <div style="border: solid; padding:10px">
+                    @post.Text
+                </div>
+            </nav><br />
+        }
+    </form>
+</nav>

@@ -39,13 +39,13 @@ namespace Services
         {
             var myuser = _UserRepository.GetById(userId);
 
-            if(myuser == null)
+            if (myuser == null)
             {
                 throw new ArgumentException($"There is no user with id {userId}");
             }
 
             var UserGroups = myuser.UserGroup;
-            foreach(var group in UserGroups)
+            foreach (var group in UserGroups)
             {
                 if (group.GroupId == groupId)
                 {

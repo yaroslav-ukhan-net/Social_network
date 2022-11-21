@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Social_network.Data.AppUser> SignInManager
+
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,73 +13,79 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <header>
+    <header style="background-color: #e3f2fd;">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="User" asp-action="UserPage" asp-route-id="1">Social_network</a>
+            <div class="container" >
+                <a class="navbar-brand" asp-area="" asp-controller="User" asp-action="MyPage">Social_network</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="User" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="User" asp-action="CreateNewAccount">Create Account</a>
-                        </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                <div class="navbar-text collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 text-lg-right"  text-align="right">
+                        <li class="nav-item"><a class="nav-link text-dark" asp-controller="Security" asp-action="Logout">Logout</a></li>
+                        <li><p>@User.Identity.Name</p></li>
                     </ul>
                 </div>
+                }
             </div>
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
-            <div class="form-horizontal">
+        @if (User.Identity.IsAuthenticated)
+        {
+<main role="main" class="pb-3">
+    <div class="form-horizontal">
 
-                <div class="container">
-                    <table border-collapse="collaps">
-                        <tr>
-                            <td class="align-top">
-                                <table class="table table-bordered" style="border-collapse:separate">
+        <div class="container">
+            <table border-collapse="collaps">
+                <tr>
+                    <td class="align-top">
+                        <table class="table table-bordered" style="border-collapse:separate">
 
-                                    <tr>
-                                        <td bgcolor="#D3EDF6" style="padding:0px">
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="UserPage" asp-route-id="1">Главная</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="alert-dark" style="padding:0px">
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Лента</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="alert-dark" style="padding:0px">
-                                            <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Сообщения</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="alert-dark" style="padding:0px">
-                                            <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups" asp-route-id="1">Группы</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="alert-dark" style="padding:0px">
-                                            <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends" asp-route-id="1">Друзья</a>
-                                        </td>
-                                    </tr>
+                            <tr>
+                                <td bgcolor="#D3EDF6" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="User" asp-action="MyPage">Главная</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Лента</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="User" asp-action="??????">Сообщения</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups">Группы</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="alert-dark" style="padding:0px">
+                                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">Друзья</a>
+                                </td>
+                            </tr>
 
-                                </table>
-                            </td>
-                            <td width="100%" style="vertical-align:top">
-                                @RenderBody()
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </main>
+                        </table>
+                    </td>
+                    <td width="100%" style="vertical-align:top">
+                        @RenderBody()
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</main> }
+else
+{
+<main>
+    @RenderBody()
+</main>}
     </div>
 
     <footer class="border-top footer text-muted">
