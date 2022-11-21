@@ -17,5 +17,6 @@ namespace Social_network.ViewModels
         public string Notes { get; set; }
         public Post NewPost { get; set; }
         public List<PostViewModel> Posts { get; set; }
+        public string Email { get; set; }
     }
 }

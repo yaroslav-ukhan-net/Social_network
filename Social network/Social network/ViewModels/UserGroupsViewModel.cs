@@ -15,14 +15,4 @@ namespace Social_network.ViewModels
         public string AvatarURL { get; set; }
         public virtual List<GroupsViewModel> Groups { get; set; }
     }
-    public class GroupsViewModel
-    {
-        public int GroupId { get; set; }
-        public int GroupAdminId { get; set; }
-        public string GroupName { get; set; }
-        public int GroupCountFollowers { get; set; }
-        public DateTime GroupCreateDate { get; set; }
-        public string GroupAvatarURL { get; set; }
-        public string GroupNotes { get; set; }
-    }
 }

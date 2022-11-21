@@ -1,27 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Models;
-using Models.Models;
+//using Models;
+//using Models.Models;
 using Services;
 using Social_network.Models;
 using Social_network.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Models;
+using Models.Models;
+using Microsoft.AspNetCore.Identity;
+using Social_network.Data;
 
 namespace Social_network.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly UserService _userService;
         private readonly PostService _postService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public UserController(UserService userService, PostService postService)
+        public UserController(UserService userService, PostService postService, IAuthorizationService authorizationService, UserManager<AppUser> userManager)
         {
             _userService = userService;
             _postService = postService;
+            _userManager = userManager;
+            _authorizationService = authorizationService;
+        }
+
+        [HttpGet]
+        public IActionResult MyPage()
+        {
+            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            return RedirectToAction("UserPage", "User", new { id = id });
         }
 
         //Get:User/UserPage/id
@@ -29,7 +46,7 @@ namespace Social_network.Controllers
         public IActionResult UserPage(int id)
         {
             var User = _userService.GetUserById(id);
-            if(User == null)
+            if (User == null)
             {
                 return NotFound();
             }
@@ -41,15 +58,16 @@ namespace Social_network.Controllers
             model.PhoneNumber = User.PhoneNumber;
             model.Surname = User.Surname;
             model.AvatarURL = User.AvatarURL;
+            model.Email = User.Email;
             model.Posts = new List<PostViewModel>();
-            
+
 
             var NotSortedAllPosts = _postService.GetAllPosts();
-            var AllPosts = from s in NotSortedAllPosts
-                          orderby s.PostTime descending
-                           select s;
+            var SortedAllPosts = from s in NotSortedAllPosts
+                                 orderby s.PostTime descending
+                                 select s;
 
-            foreach(var post in AllPosts)
+            foreach (var post in SortedAllPosts)
             {
                 if (post.UserId == id)
                 {
@@ -82,12 +100,17 @@ namespace Social_network.Controllers
                 return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
             }
         }
-
         [HttpGet]
-        public IActionResult EditMyInformation(int id)
+        public async Task<IActionResult> EditMyInformation()
         {
+            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
             var MyUserInformation = _userService.GetUserById(id);
-            return View(ToViewModel(MyUserInformation));
+            var result = await _authorizationService.AuthorizeAsync(User, MyUserInformation, "OwnerPagePolicy");
+            if (result.Succeeded)
+            {
+                return View(ToViewModel(MyUserInformation));
+            }
+            return Forbid();
         }
 
         [HttpPost]

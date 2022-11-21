@@ -15,19 +15,27 @@
                     День рождения : @Model.BirthDate.ToString("d")<br style="padding:20px">
                     Номер телефона : @Model.PhoneNumber<br>
                     О себе : @Model.Notes<br />
-                    <a class="nav-link text-dark, border-dark" asp-controller="User" asp-action="EditMyInformation" asp-route-id="@Model.Id">Редактировать мою информацию</a>
+                    
+                    @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
+                    {
+                        <a class="nav-link text-dark, border-dark" asp-controller="User" asp-action="EditMyInformation" asp-route-id="@Model.Id">Редактировать мою информацию</a>
+                    }
                 </div>
             </td>
         </tr>
     </table>
     <nav>
-        <form asp-action="Send">
+        @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
+        {
+            <form asp-action="Send">
 
-            @Html.HiddenFor(m => Model.Id)
-            Опубликуйте новость:
-            <input type="text" asp-for="NewPost.Text" />
-            <input type="hidden" asp-for="NewPost.UserId" />
-            <input type="submit" value="Отправить пост" class="btn btn-primary" />
+                @Html.HiddenFor(m => Model.Id)
+                Опубликуйте новость:
+                <input type="text" asp-for="NewPost.Text" />
+                <input type="hidden" asp-for="NewPost.UserId" />
+                <input type="submit" value="Отправить пост" class="btn btn-primary" />
+            </form>
+        }
             @foreach (var post in Model.Posts)
             {
                 <nav>
@@ -37,6 +45,5 @@
                     </div>
                 </nav><br />
             }
-        </form>
-    </nav>
+        </nav>
 

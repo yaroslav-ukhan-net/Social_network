@@ -1,15 +1,23 @@
 using Data_SocialNetwork.EF;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Models;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
 using Services;
+using Social_network.Authorization;
+using Social_network.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Social_network
@@ -29,12 +37,35 @@ namespace Social_network
             services.Configure<RepositoryOptions>(Configuration);
             services.AddDbContext<SocialNetworkContext>();
 
+
             services.AddScoped<UserService>();
             services.AddScoped<PostService>();
             services.AddScoped<FriendService>();
             services.AddScoped<GroupService>();
 
+
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("IdentityConnectionString")));
+            services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+
+
+            services.AddScoped<IAuthorizationHandler, AdminOrPageOwner>();
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.LoginPath = "/Security/Login";
+                config.Cookie.Name = "SocialNetwork";
+            });
             services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(SocialNetworkRepository<>)));
+
+
+
+            services.AddAuthorization(config =>
+            {
+                config.AddPolicy("OwnerPagePolicy", builder =>
+                 builder.Requirements.Add(new CustomPageOwnerClaim()));
+            });
+            
 
             services.AddControllersWithViews();
         }
@@ -57,7 +88,11 @@ namespace Social_network
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
+           
 
             app.UseEndpoints(endpoints =>
             {

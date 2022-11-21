@@ -15,7 +15,9 @@ namespace Models.Models
         public DateTime CreateDate { get; set; }
         public string AvatarURL { get; set; }
         public string Notes { get; set; }
+        public bool IsClose { get; set; }
         public virtual List<Post> Posts { get; set; } 
         public virtual List<UserGroup> UserGroup { get; set; } 
+        public virtual List<User> Moderators { get; set; }
     }
 }

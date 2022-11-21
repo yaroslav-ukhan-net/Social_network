@@ -6,16 +6,16 @@
             <ul class="navbar-nav flex-grow-1">
                 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends" asp-route-id="@Model.Id">Мои друзья</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">Мои друзья</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends" asp-route-id="@Model.Id">Отправленные заявки</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends" >Отправленные заявки</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends" asp-route-id="@Model.Id">Полученные заявки</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends">Полученные заявки</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends" asp-route-id="@Model.Id">Добавить друга</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends">Добавить друга</a>
                 </li>
             </ul>
         </div>
@@ -60,18 +60,18 @@
                     <td>
                         @if (ViewData["Doing"].ToString() == "DoingsWithFriends")
                         {
-                            @Html.ActionLink("Удалить", "DeleteFriend", new { UserSender = Model.Id, UserRequest = friend.Id })
+                            @Html.ActionLink("Удалить", "DeleteFriend", new { UserRequest = friend.Id })
                         }
 
                         @if (ViewData["Doing"].ToString() == "RequestFriends")
                         {
-                            @Html.ActionLink("Отклонить", "CancelRequestFriendship", new { UserSender = friend.Id, UserRequest = Model.Id })
-                            @Html.ActionLink("Принять", "AcceptNewFriend", new { UserSender = friend.Id, UserRequest = Model.Id })
+                            @Html.ActionLink("Отклонить", "CancelRequestFriendship", new { UserRequest = friend.Id })
+                            @Html.ActionLink("Принять", "AcceptNewFriend", new {UserRequest = friend.Id })
                         }
 
                         @if (ViewData["Doing"].ToString() == "SendFriends")
                         {
-                            @Html.ActionLink("Отменить заявку", "CancelSendFriendship", new { UserSender = Model.Id, UserRequest = friend.Id })
+                            @Html.ActionLink("Отменить заявку", "CancelSendFriendship", new { UserRequest = friend.Id })
                         }
 
                     </td>
