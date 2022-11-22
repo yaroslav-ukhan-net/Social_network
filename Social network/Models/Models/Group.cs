@@ -18,6 +18,5 @@ namespace Models.Models
         public bool IsClose { get; set; }
         public virtual List<Post> Posts { get; set; } 
         public virtual List<UserGroup> UserGroup { get; set; } 
-        public virtual List<User> Moderators { get; set; }
     }
 }

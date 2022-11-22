@@ -58,7 +58,6 @@ namespace Data_SocialNetwork.EF
         public DbSet<Friend> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<UserGroup> UserGroup { get; set; }
-        public DbSet<User> Moderators { get; set; }
         
     }
 }

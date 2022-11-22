@@ -6,16 +6,16 @@
             <ul class="navbar-nav flex-grow-1">
 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups" asp-route-id="@Model.Id">Мои группы</a>
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups">Подписан</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Group" asp-action="NewGroups" asp-route-id="@Model.Id">Новые группы</a>
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="NewGroups">Новые группы</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Group" asp-action="CreateGroup" asp-route-id="@Model.Id">Создать группу</a>
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="SubmittedRequests">Отправленные заявки</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Group" asp-action="AddFreeFriends" asp-route-id="@Model.Id">------</a>
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="CreateGroup">Создать группу</a>
                 </li>
             </ul>
         </div>
@@ -51,7 +51,7 @@
                         <img src="@group.GroupAvatarURL" width="15" />
                     </td>
                     <td>
-                        @Html.ActionLink(@group.GroupName, "GroupPage", new { UserId = Model.Id, GroupPageId = group.GroupId })
+                        @Html.ActionLink(@group.GroupName, "GroupPage", new { GroupId = group.GroupId })
                     </td>
                     <td>
                         @group.GroupCountFollowers
@@ -61,20 +61,6 @@
                     </td>
                     <td>
                         @group.GroupNotes
-                    </td>
-                    <td>
-                        @if (ViewData["PageName"].ToString() == "NewGroups")
-                        {
-                            if (group.IsClose)
-                            {
-                                @Html.ActionLink("Отправить заявку", "AddGroup", new { MyUserId = Model.Id, AddGroupId = group.GroupId })
-                            }
-                            else
-                            {
-                                @Html.ActionLink("Подписаться", "AddGroup", new { MyUserId = Model.Id, AddGroupId = group.GroupId })
-                            }
-
-                        }
                     </td>
                 </tr>
             </tbody>

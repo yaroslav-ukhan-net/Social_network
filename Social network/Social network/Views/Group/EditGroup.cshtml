@@ -2,9 +2,19 @@
 
 <form asp-action=@ViewData["Action"]>
     <div>
-        <h4>Create new Group</h4>
+        @if (ViewData["Action"].ToString() == "EditGroup")
+        {
+            <h4>Edit group</h4>
+        }
+        else
+        {
+            <h4>Create new Group</h4>
+        }
         <hr />
-        <input type="hidden" asp-for="GroupAdminId" />
+        @Html.HiddenFor(n=>n.UserIsModerator)
+        @Html.HiddenFor(n=>n.GroupAdminName)
+        @Html.HiddenFor(n=>n.GroupId)
+        
         <div class="form-group">
             <label asp-for="GroupName" class="col-lg-2 col-form-label"></label>
             <div class="col-md-10">

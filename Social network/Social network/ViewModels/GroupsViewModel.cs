@@ -9,9 +9,10 @@ namespace Social_network.ViewModels
 {
     public class GroupsViewModel
     {
-        public int Id { get; set; }
         public int GroupId { get; set; }
-        public int GroupAdminId { get; set; }
+        public string GroupAdminName { get; set; }
+        public bool UserIsModerator { get; set; }
+        public bool MyUserConsistInGroup { get; set; }
         public string GroupName { get; set; }
         public bool IsClose { get; set; }
         public int GroupCountFollowers { get; set; }

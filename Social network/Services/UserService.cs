@@ -50,10 +50,17 @@ namespace Services
                 if (group.GroupId == groupId)
                 {
                     myuser.UserGroup.Remove(group);
+                    if (group.ConsistInGroup)
+                    {
+                        var editedgroup = _GroupRepository.GetById(groupId);
+                        editedgroup.CountFollowers--;
+                        _GroupRepository.Update(editedgroup);
+                    }
                     break;
                 }
             }
             _UserRepository.Update(myuser);
+            
         }
     }
 }
