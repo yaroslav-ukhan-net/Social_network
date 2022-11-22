@@ -13,5 +13,6 @@ namespace Models.Models
         public int GroupId { get; set; }
         public virtual Group Group { get; set; }
         public bool IsModerator { get; set; }
+        public bool ConsistInGroup { get; set; }
     }
 }

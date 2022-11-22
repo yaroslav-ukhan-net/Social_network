@@ -55,6 +55,7 @@ namespace Social_network.Controllers
             model.Id = id;
             model.Name = User.Name;
             model.Notes = User.Notes;
+            model.BirthDate = User.BirthDate;
             model.PhoneNumber = User.PhoneNumber;
             model.Surname = User.Surname;
             model.AvatarURL = User.AvatarURL;
@@ -88,6 +89,7 @@ namespace Social_network.Controllers
         [HttpPost]
         public IActionResult Send (UserViewModel sendpost)
         {
+            int Userid = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
             if (sendpost.NewPost.Text == null)
             {
                 return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
@@ -95,7 +97,7 @@ namespace Social_network.Controllers
             else
             {
                 sendpost.NewPost.PostTime = DateTime.Now;
-                sendpost.NewPost.UserId = sendpost.Id;
+                sendpost.NewPost.UserId = Userid;
                 _postService.CreatePost(ToModel(sendpost.NewPost));
                 return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
             }
@@ -117,7 +119,7 @@ namespace Social_network.Controllers
         public IActionResult EditMyInformation(UserViewModel userView)
         {
             _userService.UpdateUser(ToModel(userView));
-            return RedirectToAction("UserPage");
+            return RedirectToAction("MyPage","User");
         }
 
         private UserViewModel ToViewModel(User user)
@@ -130,7 +132,8 @@ namespace Social_network.Controllers
                 Name = user.Name,
                 Notes = user.Notes,
                 PhoneNumber = user.PhoneNumber,
-                Surname = user.Surname
+                Surname = user.Surname,
+                 Email = user.Email
             };
         }
         private Post ToModel(Post postView)
@@ -152,7 +155,8 @@ namespace Social_network.Controllers
                 Name = userView.Name,
                 PhoneNumber = userView.PhoneNumber,
                 Surname = userView.Surname,
-                Notes = userView.Notes
+                Notes = userView.Notes,
+                 Email = userView.Email
             };
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Social_network.Data
 {
@@ -19,7 +20,7 @@ namespace Social_network.Data
         public AppUser(string userName) : base(userName)
         {
         }
-
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int AppUserId { get; set; }
     }
 }

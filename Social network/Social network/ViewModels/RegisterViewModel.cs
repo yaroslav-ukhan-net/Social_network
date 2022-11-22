@@ -16,9 +16,16 @@ namespace Social_network.ViewModels
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Surname { get; set; }
+
+        [DataType(DataType.Date)]
+        [Range(typeof(DateTime), "1/1/1900", "1/1/2022",
+            ErrorMessage = "Value for {0} must be between {1} and {2}")]
+        public DateTime BirthDate { get; set; }
+        [Required]
+        public string PhoneNumber { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace Social_network
             services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
 
 
-            services.AddScoped<IAuthorizationHandler, AdminOrPageOwner>();
+            
             services.ConfigureApplicationCookie(config =>
             {
                 config.LoginPath = "/Security/Login";
@@ -59,11 +59,19 @@ namespace Social_network
             services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(SocialNetworkRepository<>)));
 
 
-
+            services.AddScoped<IAuthorizationHandler, AdminOrPageOwner>();
             services.AddAuthorization(config =>
             {
                 config.AddPolicy("OwnerPagePolicy", builder =>
                  builder.Requirements.Add(new CustomPageOwnerClaim()));
+            });
+
+
+            services.AddScoped<IAuthorizationHandler, AdminModeratorOrOwnerGroup>();
+            services.AddAuthorization(config =>
+            {
+                config.AddPolicy("OwnerOrModeratorGroupPolicy", builder =>
+                 builder.Requirements.Add(new CustomGroupOwnerClaim()));
             });
             
 
@@ -98,7 +106,7 @@ namespace Social_network
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=User}/{action=UserPage}/{id=1}");
+                    pattern: "{controller=User}/{action=MyPage}");
                 //pattern: "{controller}/{action}/{id?}");
             });
         }

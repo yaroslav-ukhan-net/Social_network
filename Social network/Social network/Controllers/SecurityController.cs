@@ -90,6 +90,17 @@ namespace Social_network.Controllers
                 if (result.Succeeded)
                 {
                     var User = _userManager.Users.SingleOrDefault(p => p.Email == model.Email);
+                    _userService.CreateUser(new User()
+                    {
+                        AvatarURL = "https://i.imgur.com/7wwkYMN.png",
+                        BirthDate = model.BirthDate,
+                        Name = model.Name,
+                        PhoneNumber = model.PhoneNumber,
+                        Surname = model.Surname,
+                        Email = model.Email,
+                        Id = User.AppUserId
+                    });
+                    
                     return RedirectToAction("UserPage", "User", new { id = User.AppUserId });
                 }
                 else
