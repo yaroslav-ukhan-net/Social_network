@@ -64,7 +64,8 @@ namespace Social_network.Controllers
                         GroupCreateDate = group.CreateDate,
                         GroupId = group.Id,
                         GroupName = group.Name,
-                        GroupNotes = group.Notes
+                        GroupNotes = group.Notes,
+                        GroupAdminName = _UserService.GetUserById(group.AdminId).Email
                     });
                 }
             }
@@ -87,7 +88,6 @@ namespace Social_network.Controllers
             {
                 AdminId = id,
                 AvatarURL = groupsView.GroupAvatarURL,
-                CountFollowers = 1,
                 Name = groupsView.GroupName,
                 Notes = groupsView.GroupNotes,
                 CreateDate = DateTime.Now,
@@ -156,6 +156,8 @@ namespace Social_network.Controllers
             var AllPosts = _PostService.GetAllPosts();
             GroupsViewModel model = new();
             model.GroupAdminName = _UserService.GetUserById(mygroup.AdminId).Email;
+            model.GroupAdminUsername = _UserService.GetUserById(mygroup.AdminId).Name + " " + _UserService.GetUserById(mygroup.AdminId).Surname;
+            model.GroupAdminId = mygroup.AdminId.ToString();
             model.GroupAvatarURL = mygroup.AvatarURL;
             model.GroupCountFollowers = mygroup.CountFollowers;
             model.GroupCreateDate = mygroup.CreateDate;
@@ -163,6 +165,7 @@ namespace Social_network.Controllers
             model.GroupName = mygroup.Name;
             model.GroupNotes = mygroup.Notes;
             model.IsClose = mygroup.IsClose;
+            model.GroupCountFollowersRequests = 0;
             model.Posts = new List<PostViewModel>();
             foreach (var user in mygroup.UserGroup)
             {
@@ -177,6 +180,7 @@ namespace Social_network.Controllers
                 }
                 else
                 {
+                    model.GroupCountFollowersRequests++;
                     if (user.UserId == UserId)//Отправил заявку в закрытую группу?
                     {
                         ViewData["ActionCloseGroup"] = "UnsubscribeFromGroup";
@@ -247,9 +251,20 @@ namespace Social_network.Controllers
                 var groupfromBD = _GroupService.GetGroupById(group.GroupId);
                 groupfromBD.Notes = group.GroupNotes;
                 groupfromBD.Name = group.GroupName;
+                if(groupfromBD.IsClose && !group.IsClose)    //Close => open group
+                {
+                    foreach(var u in groupfromBD.UserGroup)
+                    {
+                        if (!u.ConsistInGroup)
+                        {
+                            u.ConsistInGroup = true;
+                        }
+                    }
+                }
                 groupfromBD.IsClose = group.IsClose;
                 groupfromBD.AvatarURL = group.GroupAvatarURL;
                 _GroupService.UpdateGroup(groupfromBD);
+                
                 return RedirectToAction("GroupPage", new { GroupId = group.GroupId });
             }
             return Forbid();
@@ -272,7 +287,7 @@ namespace Social_network.Controllers
             return Forbid();
         }
         [HttpGet]
-        public IActionResult UnsubscribeFromGroup(int id) //отписаться
+        public IActionResult UnsubscribeFromGroup(int id)     //отписаться
         {
             int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
             var group = _GroupService.GetGroupById(id);
@@ -302,7 +317,6 @@ namespace Social_network.Controllers
             {
                 UserGroup requestjoin = new() { UserId = UserId, GroupId = id, ConsistInGroup = true, IsModerator = false };
                 MyUser.UserGroup.Add(requestjoin);
-                group.CountFollowers++;
                 _GroupService.UpdateGroup(group);
             }
             _UserService.UpdateUser(MyUser);
@@ -310,29 +324,44 @@ namespace Social_network.Controllers
         }
         //Post post
         [HttpPost]
-        public IActionResult Send(GroupsViewModel groupsViewModel)
+        public async Task<IActionResult> Send(GroupsViewModel groupsViewModel) //отправить посты
         {
             int Userid = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(Userid);
             if (groupsViewModel.NewPost.Text == null)
             {
                 return RedirectToAction("GroupPage", new { GroupId = groupsViewModel.GroupId });
             }
             else
             {
-                _PostService.CreatePost(new Post()
+                var UserGroups = MyUser.UserGroup;
+                foreach (var gr in UserGroups)
                 {
-                    PostTime = DateTime.Now,
-                    UserId = Userid,
-                    Text = groupsViewModel.NewPost.Text,
-                    GroupId = groupsViewModel.GroupId
-                });
-                return RedirectToAction("GroupPage", new { GroupId = groupsViewModel.GroupId });
+                    if (gr.GroupId == groupsViewModel.GroupId)
+                    {
+                        groupsViewModel.UserIsModerator = gr.IsModerator;
+                        break;
+                    }
+                }
+                var result = await _authorizationService.AuthorizeAsync(User, groupsViewModel, "OwnerOrModeratorGroupPolicy");
+                if (result.Succeeded)
+                {
+                    _PostService.CreatePost(new Post()
+                    {
+                        PostTime = DateTime.Now,
+                        UserId = Userid,
+                        Text = groupsViewModel.NewPost.Text,
+                        GroupId = groupsViewModel.GroupId
+                    });
+                    return RedirectToAction("GroupPage", new { GroupId = groupsViewModel.GroupId });
+                }
+                return Forbid();
             }
         }
         [HttpGet]
-        public IActionResult SubmittedRequests()
+        public IActionResult SubmittedRequests() //вкладка с исходящими запросами в группы
         {
-            ViewData["PageName"] = "Отправленные запросы";
+            ViewData["PageName"] = "Requests";
             int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
             var AllGroups = _GroupService.GetAllGroups();
             var MyUser = _UserService.GetUserById(id);
@@ -364,7 +393,7 @@ namespace Social_network.Controllers
             return View("MyGroups", model);
         }
         [HttpGet]
-        public IActionResult ShowSubscribers(int id)
+        public IActionResult ShowSubscribers(int id) //показать всех попищиков
         {
             int Userid = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
             var MyUser = _UserService.GetUserById(Userid);
@@ -403,6 +432,227 @@ namespace Social_network.Controllers
 
 
             return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RequestsInGroup(int id)   // активные запросы в группу
+        {
+            int Userid = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(Userid);
+            var MyGroup = _GroupService.GetGroupById(id);
+
+            if (MyGroup == null || !MyGroup.IsClose) return BadRequest();
+
+            GroupsViewModel model = new();
+            model.GroupAdminName = _UserService.GetUserById(MyGroup.AdminId).Name;
+            var UserGroups = _UserService.GetUserById(Userid).UserGroup;
+            foreach (var gr in UserGroups)
+            {
+                if (gr.GroupId == id)
+                {
+                    model.UserIsModerator = gr.IsModerator;
+                    break;
+                }
+            }
+            var result = await _authorizationService.AuthorizeAsync(User, model, "OwnerOrModeratorGroupPolicy");
+            if (result.Succeeded)
+            {
+                model.GroupAdminName = _UserService.GetUserById(MyGroup.AdminId).Email;
+                model.GroupAvatarURL = MyGroup.AvatarURL;
+                model.GroupCountFollowers = MyGroup.CountFollowers;
+                model.GroupCreateDate = MyGroup.CreateDate;
+                model.GroupId = id;
+                model.GroupName = MyGroup.Name;
+                model.Users = new();
+                foreach (var u in MyGroup.UserGroup)
+                {
+                    if (u.ConsistInGroup == false)
+                    {
+                        model.Users.Add(u.User);
+                    }
+                }
+                return View(model);
+            }
+            return Forbid();
+        }
+        [HttpGet]
+        public async Task<IActionResult> AddFollowerInGroup(int GroupId,int UserAddId)           //принять чела в группу
+        {
+            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(UserId);
+            var group = _GroupService.GetGroupById(GroupId);
+            var UserForAdding = _UserService.GetUserById(UserAddId);
+            if (group == null || UserForAdding == null || !group.IsClose) return BadRequest();
+
+            GroupsViewModel model = new();
+            model.GroupAdminName = _UserService.GetUserById(group.AdminId).Email;
+            var UserGroups = MyUser.UserGroup;
+            foreach (var gr in UserGroups)
+            {
+                if (gr.GroupId == GroupId)
+                {
+                    model.UserIsModerator = gr.IsModerator;
+                    break;
+                }
+            }
+            var result = await _authorizationService.AuthorizeAsync(User, model, "OwnerOrModeratorGroupPolicy");
+            if (result.Succeeded)
+            {
+                foreach (UserGroup ug in UserForAdding.UserGroup)
+                {
+                    if (ug.GroupId == GroupId)
+                    {
+                        ug.ConsistInGroup = true;
+                        _GroupService.UpdateGroup(group);
+                        _UserService.UpdateUser(UserForAdding);
+                        break;
+                    }
+                }
+                return RedirectToAction("RequestsInGroup", new { id = GroupId });
+            }
+            return Forbid();
+        }
+        [HttpGet]
+        public async Task<IActionResult> CancelFollowerFromGroup(int GroupId, int UserAddId)           //отклонить запрос в группу
+        {
+            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(UserId);
+            var group = _GroupService.GetGroupById(GroupId);
+            var UserForRemoving = _UserService.GetUserById(UserAddId);
+            if (group == null || UserForRemoving == null || !group.IsClose) return BadRequest();
+
+            GroupsViewModel model = new();
+            model.GroupAdminName = _UserService.GetUserById(group.AdminId).Email;
+            var UserGroups = MyUser.UserGroup;
+            foreach (var gr in UserGroups)
+            {
+                if (gr.GroupId == GroupId)
+                {
+                    model.UserIsModerator = gr.IsModerator;
+                    break;
+                }
+            }
+            var result = await _authorizationService.AuthorizeAsync(User, model, "OwnerOrModeratorGroupPolicy");
+            if (result.Succeeded)
+            {
+                foreach (UserGroup ug in UserForRemoving.UserGroup)
+                {
+                    if (ug.GroupId == GroupId)
+                    {
+                        UserForRemoving.UserGroup.Remove(ug);
+                        _UserService.UpdateUser(UserForRemoving);
+                        break;
+                    }
+                }
+                return RedirectToAction("RequestsInGroup", new { id = GroupId });
+            }
+            return Forbid();
+        }
+        [HttpGet]
+        public IActionResult Moderators(int id)           //модерирование
+        {
+            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(UserId);
+            var group = _GroupService.GetGroupById(id);
+            if (group == null || MyUser == null) return BadRequest();
+
+            GroupsViewModel model = new();
+            model.GroupAdminName = _UserService.GetUserById(group.AdminId).Email;
+            model.Moderators = new();
+            model.GroupId = id;
+            model.GroupName = group.Name;
+            model.GroupCountFollowers = group.CountFollowers;
+            model.GroupAvatarURL = group.AvatarURL;
+            model.GroupCreateDate = group.CreateDate;
+
+            var result = model.GroupAdminName == MyUser.Email;
+            if (result)
+            {
+                foreach (UserGroup ug in group.UserGroup)
+                {
+                    if (ug.IsModerator)
+                    {
+                        if (ug.UserId != UserId)
+                        {
+                            model.Moderators.Add(new()
+                            {
+                                AvatarURL = ug.User.AvatarURL,
+                                 UserId = ug.User.Id,
+                                Name = ug.User.Name,
+                                Surname = ug.User.Surname,
+                                IsModerator = true
+                            }) ;
+                        }
+                    }
+                }
+                foreach (UserGroup ug in group.UserGroup)
+                {
+                    if (!ug.IsModerator)
+                    {
+                        model.Moderators.Add(new()
+                        {
+                            AvatarURL = ug.User.AvatarURL,
+                            UserId = ug.User.Id,
+                            Name = ug.User.Name,
+                            Surname = ug.User.Surname,
+                            IsModerator = false
+                        });
+                    }
+                }
+                return View(model);
+            }
+            return Forbid();
+        }
+        [HttpPost]
+        public IActionResult Moderators(GroupsViewModel model)           //модерирование
+        {
+            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(UserId);
+            var group = _GroupService.GetGroupById(model.GroupId);
+            if (group == null || MyUser == null) return BadRequest();
+
+            model.GroupAdminName = _UserService.GetUserById(group.AdminId).Email;
+
+            var result = model.GroupAdminName == MyUser.Email;
+            if (result)
+            {
+                _GroupService.SetModeratorsToGroup(model.GroupId, model.Moderators.Where(p=>p.IsModerator).Select(moderator=> moderator.UserId));
+
+                return RedirectToAction("Moderators", new { id = model.GroupId});
+            }
+            return Forbid();
+        }
+        [HttpGet]
+        public async Task <IActionResult> DeletePost(int PostId) //remove post
+        {
+            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _UserService.GetUserById(UserId);
+            var PostForRemoving = _PostService.GetPostsById(PostId);
+            if (PostForRemoving.GroupId == null) return BadRequest();
+
+            var group = _GroupService.GetGroupById((int)PostForRemoving.GroupId);
+            if (group == null)
+            {
+                return BadRequest();
+            }
+
+            GroupsViewModel model = new();
+            model.GroupAdminName = _UserService.GetUserById(group.AdminId).Email;
+            var UserGroups = MyUser.UserGroup;
+            foreach (var gr in UserGroups)
+            {
+                if (gr.GroupId == PostForRemoving.GroupId)
+                {
+                    model.UserIsModerator = gr.IsModerator;
+                    break;
+                }
+            }
+            var result = await _authorizationService.AuthorizeAsync(User, model, "OwnerOrModeratorGroupPolicy");
+            if (result.Succeeded)
+            {
+                _PostService.DeletePost(PostId);
+                return RedirectToAction("GroupPage", new { PostForRemoving.GroupId });
+            }
+            return Forbid();
         }
     }
 }

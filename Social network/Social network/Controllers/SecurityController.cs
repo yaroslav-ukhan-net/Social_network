@@ -1,7 +1,9 @@
 ﻿using Data_SocialNetwork.EF;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Models;
@@ -15,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-//using System.Web.Security;
 
 namespace Social_network.Controllers
 {
@@ -29,8 +30,8 @@ namespace Social_network.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public SecurityController(
-            UserManager<AppUser> userManager, 
-            SignInManager<AppUser> signInManager, 
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             UserService userService)
         {
@@ -68,7 +69,7 @@ namespace Social_network.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid Login");
+                    ModelState.AddModelError(string.Empty, "Invalid Login or password");
                     return View(model);
                 }
             }
@@ -86,7 +87,7 @@ namespace Social_network.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _userManager.CreateAsync( new AppUser(model.Email) { Email = model.Email}, model.Password);
+                var result = await _userManager.CreateAsync(new AppUser(model.Email) { Email = model.Email }, model.Password);
                 if (result.Succeeded)
                 {
                     var User = _userManager.Users.SingleOrDefault(p => p.Email == model.Email);
@@ -100,7 +101,7 @@ namespace Social_network.Controllers
                         Email = model.Email,
                         Id = User.AppUserId
                     });
-                    
+
                     return RedirectToAction("UserPage", "User", new { id = User.AppUserId });
                 }
                 else
@@ -117,6 +118,14 @@ namespace Social_network.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login", "Security");
+        }
+        [HttpPost]
+        public ActionResult ChangeCulture(string lang, string returnUrl)
+        {
+            Response.Cookies.Append(CookieRequestCultureProvider.DefaultCookieName, CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(lang)),
+                 new CookieOptions { Expires = DateTimeOffset.Now.AddDays(30) });
+
+            return LocalRedirect(returnUrl);
         }
     }
 }

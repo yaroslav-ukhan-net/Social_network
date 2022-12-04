@@ -11,6 +11,8 @@ namespace Social_network.ViewModels
     {
         public int GroupId { get; set; }
         public string GroupAdminName { get; set; }
+        public string GroupAdminId { get; set; }
+        public string GroupAdminUsername { get; set; }
         public bool UserIsModerator { get; set; }
         public bool MyUserConsistInGroup { get; set; }
         public string GroupName { get; set; }
@@ -19,8 +21,10 @@ namespace Social_network.ViewModels
         public DateTime GroupCreateDate { get; set; }
         public string GroupAvatarURL { get; set; }
         public string GroupNotes { get; set; }
+        public int GroupCountFollowersRequests { get; set; }
         public Post NewPost { get; set; }
         public List<User> Users { get; set; }
+        public List<ModeratorsViewModel> Moderators { get; set; }
         public List<PostViewModel> Posts { get; set; }
     }
 }
