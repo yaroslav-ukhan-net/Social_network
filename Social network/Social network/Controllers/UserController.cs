@@ -15,6 +15,10 @@ using Models;
 using Models.Models;
 using Microsoft.AspNetCore.Identity;
 using Social_network.Data;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
 
 namespace Social_network.Controllers
 {
@@ -26,7 +30,13 @@ namespace Social_network.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<AppUser> _userManager;
 
-        public UserController(UserService userService, PostService postService, IAuthorizationService authorizationService, UserManager<AppUser> userManager)
+
+        public UserController(
+            UserService userService, 
+            PostService postService, 
+            IAuthorizationService authorizationService, 
+            UserManager<AppUser> userManager
+            )
         {
             _userService = userService;
             _postService = postService;
@@ -122,6 +132,21 @@ namespace Social_network.Controllers
             return RedirectToAction("MyPage","User");
         }
 
+        [HttpGet]
+        public IActionResult DeletePost(int PostId) //remove post
+        {
+            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            var MyUser = _userService.GetUserById(UserId);
+            var PostForRemoving = _postService.GetPostsById(PostId);
+
+            if (PostForRemoving.UserId == UserId)
+            {
+                _postService.DeletePost(PostId);
+                return RedirectToAction("MyPage");
+            }
+            return Forbid();
+        }
+
         private UserViewModel ToViewModel(User user)
         {
             return new UserViewModel()
@@ -158,6 +183,19 @@ namespace Social_network.Controllers
                 Notes = userView.Notes,
                  Email = userView.Email
             };
+        }
+        [HttpGet]
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            culture = "uk-UA";
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+            );
+
+            //return LocalRedirect(returnUrl);
+            return RedirectToAction("MyPage");
         }
     }
 }

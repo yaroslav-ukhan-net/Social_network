@@ -59,7 +59,6 @@ namespace Social_network.Controllers
                             Id = u.Friend_twoId,
                             Name = u.Friend_two.Name,
                             AvatarURL = u.Friend_two.AvatarURL,
-                            PhoneNumber = u.Friend_two.PhoneNumber,
                             Surname = u.Friend_two.Surname
                         });
                     }
@@ -70,7 +69,6 @@ namespace Social_network.Controllers
                             Id = u.Friend_one.Id,
                             Name = u.Friend_one.Name,
                             AvatarURL = u.Friend_one.AvatarURL,
-                            PhoneNumber = u.Friend_one.PhoneNumber,
                             Surname = u.Friend_one.Surname
                         });
                     }
@@ -109,7 +107,6 @@ namespace Social_network.Controllers
                             Id = u.Friend_twoId,
                             Name = u.Friend_two.Name,
                             AvatarURL = u.Friend_two.AvatarURL,
-                            PhoneNumber = u.Friend_two.PhoneNumber,
                             Surname = u.Friend_two.Surname
                         });
                     }
@@ -147,7 +144,6 @@ namespace Social_network.Controllers
                             Id = u.Friend_one.Id,
                             Name = u.Friend_one.Name,
                             AvatarURL = u.Friend_one.AvatarURL,
-                            PhoneNumber = u.Friend_one.PhoneNumber,
                             Surname = u.Friend_one.Surname
                         });
                     }
@@ -171,14 +167,14 @@ namespace Social_network.Controllers
                 return BadRequest();
             }
 
-            UserAddFriendsViewModel model = new();
+            FriendsViewModel model = new();
             model.Id = id;
             model.Name = MainUser.Name;
             model.Surname = MainUser.Surname;
             model.AvatarURL = MainUser.AvatarURL;
-            model.AddFriendForModel = new();
+            model.FriendsListForModel = new();
 
-            List<AddFriendsViewModel> userwithfriends = new();
+            List<FriendsListViewModel> userwithfriends = new();
 
             foreach (var u in AllFriends)
             {
@@ -186,23 +182,21 @@ namespace Social_network.Controllers
                 {
                     if (u.Friend_oneId == id)
                     {
-                        userwithfriends.Add(new AddFriendsViewModel()
+                        userwithfriends.Add(new FriendsListViewModel()
                         {
-                            UserId = u.Friend_twoId,
+                             Id = u.Friend_twoId,
                             Name = u.Friend_two.Name,
                             AvatarURL = u.Friend_two.AvatarURL,
-                            PhoneNumber = u.Friend_two.PhoneNumber,
                             Surname = u.Friend_two.Surname
                         });
                     }
                     if (u.Friend_twoId == id)
                     {
-                        userwithfriends.Add(new AddFriendsViewModel()
+                        userwithfriends.Add(new FriendsListViewModel()
                         {
-                            UserId = u.Friend_one.Id,
+                             Id = u.Friend_one.Id,
                             Name = u.Friend_one.Name,
                             AvatarURL = u.Friend_one.AvatarURL,
-                            PhoneNumber = u.Friend_one.PhoneNumber,
                             Surname = u.Friend_one.Surname
                         });
                     }
@@ -210,15 +204,13 @@ namespace Social_network.Controllers
             }
             foreach (var withfr in AllUsers)
             {
-                if (!(userwithfriends.Any(u => u.UserId == withfr.Id) || withfr.Id == id))
+                if (!(userwithfriends.Any(u => u.Id == withfr.Id) || withfr.Id == id))
                 {
-                    model.AddFriendForModel.Add(new AddFriendsViewModel
+                    model.FriendsListForModel.Add(new FriendsListViewModel
                     {
-                        UserId = withfr.Id,
+                         Id = withfr.Id,
                         AvatarURL = withfr.AvatarURL,
-                        BirthDate = withfr.BirthDate,
                         Name = withfr.Name,
-                        PhoneNumber = withfr.PhoneNumber,
                         Surname = withfr.Surname
                     });
                 }

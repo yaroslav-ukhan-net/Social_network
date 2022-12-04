@@ -37,29 +37,28 @@ namespace Services
         }
         public virtual void UserUnsubscribe(int userId, int groupId)
         {
-            var myuser = _UserRepository.GetById(userId);
+            var myUser = _UserRepository.GetById(userId);
 
-            if (myuser == null)
+            if (myUser == null)
             {
                 throw new ArgumentException($"There is no user with id {userId}");
             }
 
-            var UserGroups = myuser.UserGroup;
+            var UserGroups = myUser.UserGroup;
             foreach (var group in UserGroups)
             {
                 if (group.GroupId == groupId)
                 {
-                    myuser.UserGroup.Remove(group);
+                    myUser.UserGroup.Remove(group);
                     if (group.ConsistInGroup)
                     {
-                        var editedgroup = _GroupRepository.GetById(groupId);
-                        editedgroup.CountFollowers--;
-                        _GroupRepository.Update(editedgroup);
+                        var editedGroup = _GroupRepository.GetById(groupId);
+                        _GroupRepository.Update(editedGroup);
                     }
                     break;
                 }
             }
-            _UserRepository.Update(myuser);
+            _UserRepository.Update(myUser);
             
         }
     }

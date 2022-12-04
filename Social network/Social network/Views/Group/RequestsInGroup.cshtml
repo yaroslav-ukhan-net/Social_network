@@ -20,7 +20,7 @@
         </td>
     </tr>
 </table>
-<div>@localizer["ShowFollowers"] </div>
+<div>@localizer["RequestsInGroup"] </div>
 <nav>
     <table class="table">
         <thead>
@@ -54,6 +54,10 @@
                     </td>
                     <td>
                         @user.PhoneNumber
+                    </td>
+                    <td>
+                        @Html.ActionLink($"{localizer["Add"].Value}", "AddFollowerInGroup", new { GroupId = Model.GroupId, UserAddId = user.Id })
+                        @Html.ActionLink($"{localizer["Cancel"].Value}", "CancelFollowerFromGroup", new { GroupId = Model.GroupId, UserAddId = user.Id })
                     </td>
                 </tr>
             </tbody>

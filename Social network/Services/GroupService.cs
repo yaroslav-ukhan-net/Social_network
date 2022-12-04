@@ -11,9 +11,12 @@ namespace Services
     public class GroupService
     {
         private readonly IRepository<Group> _GroupRepository;
-        public GroupService(IRepository<Group>  repository)
+        private readonly IRepository<User> _UserRepository;
+
+        public GroupService(IRepository<Group>  repository, IRepository<User> repository1)
         {
             _GroupRepository = repository;
+            _UserRepository = repository1;
         }
         public virtual List<Group> GetAllGroups()
         {
@@ -34,6 +37,23 @@ namespace Services
         public virtual void CreateGroup(Group group)
         {
             _GroupRepository.Create(group);
+        }
+
+        public virtual void SetModeratorsToGroup(int groupId, IEnumerable<int> ModeratorIds)
+        {
+            var group = _GroupRepository.GetById(groupId);
+            foreach(var allmoders in group.UserGroup)
+            {
+                allmoders.IsModerator = false;
+            }
+            foreach(var user in ModeratorIds)
+            {
+                group.UserGroup.FirstOrDefault(n => n.UserId == user).IsModerator = true;
+            }
+            group.UserGroup.FirstOrDefault(n => n.UserId == group.AdminId).IsModerator = true;
+            
+
+            _GroupRepository.Update(group);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Social_network.ViewModels
     public class FriendsViewModel
     {
         public int Id { get; set; }
+        public int FriendNewId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string AvatarURL { get; set; }
@@ -22,6 +23,5 @@ namespace Social_network.ViewModels
         public string Name { get; set; }
         public string Surname { get; set; }
         public string AvatarURL { get; set; }
-        public string PhoneNumber { get; set; }
     }
 }

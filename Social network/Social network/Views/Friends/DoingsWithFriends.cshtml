@@ -1,43 +1,46 @@
 ﻿@model Social_network.ViewModels.FriendsViewModel
 
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["DoingsWithFriends"];
+}
+
 <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 navbar-expand-md">
     <div class="container">
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav flex-grow-1">
-                
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">Мои друзья</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">@Localizer["MyFriends"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends" >Отправленные заявки</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends">@Localizer["Outgoing"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends">Полученные заявки</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends">@Localizer["Incoming"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends">Добавить друга</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends">@Localizer["NewFriends"]</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div> @ViewData["PageName"]</div>
+<div> @Localizer[ViewData["Doing"].ToString()]</div> 
 <nav>
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    Avatar
+                    @Localizer["Avatar"]
                 </th>
                 <th>
-                    Name
+                    @Localizer["Name"]
                 </th>
                 <th>
-                    Surname
-                </th>
-                <th>
-                    Pnome number
+                    @Localizer["Doing"]
                 </th>
             </tr>
         </thead>
@@ -49,29 +52,23 @@
                         <img src="@friend.AvatarURL" width="15" />
                     </td>
                     <td>
-                        @friend.Name
-                    </td>
-                    <td>
-                        @friend.Surname
-                    </td>
-                    <td>
-                        @friend.PhoneNumber
+                        @Html.ActionLink(friend.Name + friend.Surname, "UserPage", "User", new { Id = friend.Id })
                     </td>
                     <td>
                         @if (ViewData["Doing"].ToString() == "DoingsWithFriends")
                         {
-                            @Html.ActionLink("Удалить", "DeleteFriend", new { UserRequest = friend.Id })
+                            @Html.ActionLink($"{Localizer["Delete"].Value}", "DeleteFriend", new { UserRequest = friend.Id })
                         }
 
                         @if (ViewData["Doing"].ToString() == "RequestFriends")
                         {
-                            @Html.ActionLink("Отклонить", "CancelRequestFriendship", new { UserRequest = friend.Id })
-                            @Html.ActionLink("Принять", "AcceptNewFriend", new {UserRequest = friend.Id })
+                            @Html.ActionLink($"{Localizer["Cancel"].Value}", "CancelRequestFriendship", new { UserRequest = friend.Id })
+                            @Html.ActionLink($"{Localizer["Add"].Value}", "AcceptNewFriend", new { UserRequest = friend.Id })
                         }
 
                         @if (ViewData["Doing"].ToString() == "SendFriends")
                         {
-                            @Html.ActionLink("Отменить заявку", "CancelSendFriendship", new { UserRequest = friend.Id })
+                            @Html.ActionLink($"{Localizer["Cancel"].Value}", "CancelSendFriendship", new { UserRequest = friend.Id })
                         }
 
                     </td>

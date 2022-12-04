@@ -1,4 +1,11 @@
-﻿@model Social_network.ViewModels.UserAddFriendsViewModel
+﻿@model Social_network.ViewModels.FriendsViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["AddFreeFriends"];
+}
 
 <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 navbar-expand-md">
     <div class="container">
@@ -6,41 +13,38 @@
             <ul class="navbar-nav flex-grow-1">
 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">Мои друзья</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">@Localizer["MyFriends"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends">Отправленные заявки</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="SendFriends">@Localizer["Outgoing"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends">Полученные заявки</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="RequestFriends">@Localizer["Incoming"]</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends">Добавить друга</a>
+                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="AddFreeFriends">@Localizer["NewFriends"]</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
-<div>Добавить друга</div>
+<div>@Localizer["AddFriend"]</div>
 <nav>
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    Avatar
+                    @Localizer["Avatar"]
                 </th>
                 <th>
-                    Name
+                    @Localizer["Name"]
                 </th>
                 <th>
-                    Surname
-                </th>
-                <th>
-                    Pnome number
+                    @Localizer["Doing"]
                 </th>
             </tr>
         </thead>
-        @foreach (var friend in Model.AddFriendForModel)
+        @foreach (var friend in Model.FriendsListForModel)
         {
             <tbody>
                 <tr>
@@ -48,16 +52,10 @@
                         <img src="@friend.AvatarURL" width="15" />
                     </td>
                     <td>
-                        @friend.Name
+                        @Html.ActionLink(friend.Name + friend.Surname, "UserPage", "User", new { Id = friend.Id })
                     </td>
                     <td>
-                        @friend.Surname
-                    </td>
-                    <td>
-                        @friend.PhoneNumber
-                    </td>
-                    <td>
-                        @Html.ActionLink("Запрос в друзья", "AddFriend", new {UserRequest = friend.UserId})
+                        @Html.ActionLink($"{Localizer["SendRequest"].Value}", "AddFriend", new { UserRequest = friend.Id })
                     </td>
                 </tr>
             </tbody>
