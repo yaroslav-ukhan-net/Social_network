@@ -10,10 +10,16 @@ namespace Models.Models
 {
     public class Friend
     {
-        public virtual User Friend_one { get; set; }
-        public  int Friend_oneId { get; set; }
-        public virtual User Friend_two { get; set; }
-        public  int Friend_twoId { get; set; }
+        public virtual User FirstFriend { get; set; }
+        public  int FirstFriendId { get; set; }
+        public virtual User SecondFriend { get; set; }
+        public  int SecondFriendId { get; set; }
         public int Status { get; set; }
+    }
+    public enum StatusFriendship
+    {
+        notFriends,
+        requestToFriendship,
+        areFriends
     }
 }

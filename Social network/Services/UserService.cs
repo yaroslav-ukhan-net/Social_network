@@ -2,6 +2,8 @@
 using Models.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Services
 {
@@ -15,9 +17,13 @@ namespace Services
             _UserRepository = repository;
             _GroupRepository = repository1;
         }
-        public virtual List<User> GetAllUsers()
+        public virtual IQueryable<User> GetAllUsers()
         {
             return _UserRepository.GetAll();
+        }
+        public virtual IQueryable<User> GetAllUsersQuerible(Expression<Func<User, bool>> expression)
+        {
+            return _UserRepository.GetAllQuerible(expression);
         }
         public virtual User GetUserById(int UserId)
         {

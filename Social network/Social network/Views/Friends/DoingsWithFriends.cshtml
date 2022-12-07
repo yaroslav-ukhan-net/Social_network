@@ -57,12 +57,13 @@
                     <td>
                         @if (ViewData["Doing"].ToString() == "DoingsWithFriends")
                         {
-                            @Html.ActionLink($"{Localizer["Delete"].Value}", "DeleteFriend", new { UserRequest = friend.Id })
+                            @Html.ActionLink($"{Localizer["Delete"].Value}", "DeleteFriend", new { userToDeleteId = friend.Id })
                         }
 
                         @if (ViewData["Doing"].ToString() == "RequestFriends")
                         {
-                            @Html.ActionLink($"{Localizer["Cancel"].Value}", "CancelRequestFriendship", new { UserRequest = friend.Id })
+                            @Html.ActionLink($"{Localizer["Cancel"].Value}", "CancelRequestFriendship", new { UserRequest = friend.Id }) @(" | ")
+                            
                             @Html.ActionLink($"{Localizer["Add"].Value}", "AcceptNewFriend", new { UserRequest = friend.Id })
                         }
 

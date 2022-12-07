@@ -27,17 +27,13 @@ namespace Social_network.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserService _userService;
 
-        private readonly RoleManager<IdentityRole> _roleManager;
-
         public SecurityController(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            RoleManager<IdentityRole> roleManager,
             UserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _roleManager = roleManager;
             _userService = userService;
         }
         [HttpGet]

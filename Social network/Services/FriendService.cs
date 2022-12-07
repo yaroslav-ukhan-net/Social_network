@@ -3,6 +3,7 @@ using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace Services
         {
             _FriendRepository = repository;
         }
-        public virtual List<Friend> GetAllFriends()
+        public virtual IQueryable<Friend> GetAllFriends()
         {
             return _FriendRepository.GetAll();
         }
@@ -39,6 +40,10 @@ namespace Services
         public virtual void CreateFriend(Friend friend)
         {
             _FriendRepository.Create(friend);
+        }
+        public virtual IQueryable<Friend> GetAllFriendsQuerible(Expression<Func<Friend, bool>> expression)
+        {
+            return _FriendRepository.GetAllQuerible(expression);
         }
     }
 }

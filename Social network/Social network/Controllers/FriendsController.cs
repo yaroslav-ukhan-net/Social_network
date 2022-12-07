@@ -9,6 +9,7 @@ using Social_network.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Social_network.Controllers
@@ -18,14 +19,12 @@ namespace Social_network.Controllers
     {
         private readonly UserService _userService;
         private readonly FriendService _friendService;
-        private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<AppUser> _userManager;
 
-        public FriendsController(UserService userService, FriendService friendService, IAuthorizationService authorizationService, UserManager<AppUser> userManager)
+        public FriendsController(UserService userService, FriendService friendService, UserManager<AppUser> userManager)
         {
             _userService = userService;
             _friendService = friendService;
-            _authorizationService = authorizationService;
             _userManager = userManager;
         }
 
@@ -33,47 +32,47 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult DoingsWithFriends()
         {
-            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            ViewData["PageName"] = "Мои друзья";
+            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ? 
+                id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             ViewData["Doing"] = "DoingsWithFriends";
-            var Main_user = _userService.GetUserById(id);
-            if (Main_user == null)
-            {
-                return NotFound();
-            }
-            var AllFriends = _friendService.GetAllFriends();
+            var userMain = _userService.GetUserById(id);
+            if (userMain == null) return NotFound();
+
             FriendsViewModel model = new();
             model.Id = id;
-            model.Name = Main_user.Name;
-            model.Surname = Main_user.Surname;
-            model.AvatarURL = Main_user.AvatarURL;
+            model.Name = userMain.Name;
+            model.Surname = userMain.Surname;
+            model.AvatarURL = userMain.AvatarURL;
             model.FriendsListForModel = new();
-            foreach (var u in AllFriends)
+
+            var userFirstInFrienship = _friendService.GetAllFriendsQuerible(c =>
+               ((c.Status == (int)StatusFriendship.areFriends) &&
+               (c.FirstFriendId == id))).ToList();
+            foreach (var u in userFirstInFrienship)
             {
-                if (u.Status == 2)
+                model.FriendsListForModel.Add(new FriendsListViewModel()
                 {
-                    if (u.Friend_oneId == id)
-                    {
-                        model.FriendsListForModel.Add(new FriendsListViewModel()
-                        {
-                            Id = u.Friend_twoId,
-                            Name = u.Friend_two.Name,
-                            AvatarURL = u.Friend_two.AvatarURL,
-                            Surname = u.Friend_two.Surname
-                        });
-                    }
-                    if (u.Friend_twoId == id)
-                    {
-                        model.FriendsListForModel.Add(new FriendsListViewModel()
-                        {
-                            Id = u.Friend_one.Id,
-                            Name = u.Friend_one.Name,
-                            AvatarURL = u.Friend_one.AvatarURL,
-                            Surname = u.Friend_one.Surname
-                        });
-                    }
-                }
+                    Id = u.SecondFriendId,
+                    Name = u.SecondFriend.Name,
+                    AvatarURL = u.SecondFriend.AvatarURL,
+                    Surname = u.SecondFriend.Surname
+                });
             }
+
+            var userSecondInFrienship = _friendService.GetAllFriendsQuerible(c =>
+               ((c.Status == (int)StatusFriendship.areFriends) &&
+               (c.SecondFriendId == id))).ToList();
+            foreach (var u in userSecondInFrienship)
+            {
+                model.FriendsListForModel.Add(new FriendsListViewModel()
+                {
+                    Id = u.FirstFriend.Id,
+                    Name = u.FirstFriend.Name,
+                    AvatarURL = u.FirstFriend.AvatarURL,
+                    Surname = u.FirstFriend.Surname
+                });
+            }
+
             return View(model);
         }
 
@@ -81,36 +80,34 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult SendFriends()
         {
-            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            ViewData["PageName"] = "Отправленные заявки";
+            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             ViewData["Doing"] = "SendFriends";
-            var Main_user = _userService.GetUserById(id);
-            if (Main_user == null)
+            var mainUser = _userService.GetUserById(id);
+            if (mainUser == null)
             {
                 return NotFound();
             }
-            var AllFriends = _friendService.GetAllFriends();
+            var userRequestsQuery = _friendService.GetAllFriendsQuerible(f=>
+                        f.Status == (int)StatusFriendship.requestToFriendship && 
+                        f.FirstFriendId==id);
+
+            var userRequestsList = userRequestsQuery.ToList();
             FriendsViewModel model = new();
             model.Id = id;
-            model.Name = Main_user.Name;
-            model.Surname = Main_user.Surname;
-            model.AvatarURL = Main_user.AvatarURL;
+            model.Name = mainUser.Name;
+            model.Surname = mainUser.Surname;
+            model.AvatarURL = mainUser.AvatarURL;
             model.FriendsListForModel = new();
-            foreach (var u in AllFriends)
+            foreach (var u in userRequestsList)
             {
-                if (u.Status == 1)
+                model.FriendsListForModel.Add(new FriendsListViewModel()
                 {
-                    if (u.Friend_oneId == id)
-                    {
-                        model.FriendsListForModel.Add(new FriendsListViewModel()
-                        {
-                            Id = u.Friend_twoId,
-                            Name = u.Friend_two.Name,
-                            AvatarURL = u.Friend_two.AvatarURL,
-                            Surname = u.Friend_two.Surname
-                        });
-                    }
-                }
+                    Id = u.SecondFriendId,
+                    Name = u.SecondFriend.Name,
+                    AvatarURL = u.SecondFriend.AvatarURL,
+                    Surname = u.SecondFriend.Surname
+                });
             }
             return View("DoingsWithFriends", model);
         }
@@ -118,50 +115,45 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult RequestFriends()
         {
-            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            ViewData["PageName"] = "Полученные заявки";
+            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             ViewData["Doing"] = "RequestFriends";
-            var Main_user = _userService.GetUserById(id);
-            if (Main_user == null)
+            var mainUser = _userService.GetUserById(id);
+            if (mainUser == null)
             {
                 return NotFound();
             }
-            var AllFriends = _friendService.GetAllFriends();
+            var requestsToUserQuery = _friendService.GetAllFriendsQuerible(f =>
+            f.Status == (int)StatusFriendship.requestToFriendship &&
+            f.SecondFriendId == id);
+
+            var requestsToUserList = requestsToUserQuery.ToList();
             FriendsViewModel model = new();
             model.Id = id;
-            model.Name = Main_user.Name;
-            model.Surname = Main_user.Surname;
-            model.AvatarURL = Main_user.AvatarURL;
+            model.Name = mainUser.Name;
+            model.Surname = mainUser.Surname;
+            model.AvatarURL = mainUser.AvatarURL;
             model.FriendsListForModel = new();
-            foreach (var u in AllFriends)
+            foreach (var u in requestsToUserList)
             {
-                if (u.Status == 1)
+                model.FriendsListForModel.Add(new FriendsListViewModel()
                 {
-                    if (u.Friend_twoId == id)
-                    {
-                        model.FriendsListForModel.Add(new FriendsListViewModel()
-                        {
-                            Id = u.Friend_one.Id,
-                            Name = u.Friend_one.Name,
-                            AvatarURL = u.Friend_one.AvatarURL,
-                            Surname = u.Friend_one.Surname
-                        });
-                    }
-                }
+                    Id = u.FirstFriend.Id,
+                    Name = u.FirstFriend.Name,
+                    AvatarURL = u.FirstFriend.AvatarURL,
+                    Surname = u.FirstFriend.Surname
+                });
             }
             return View("DoingsWithFriends", model);
-            //return View("СonfirmedFriends", model);
         }
 
         //Get:Friends/AddFreeFriends/id
         [HttpGet]
         public IActionResult AddFreeFriends()
         {
-            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             var MainUser = _userService.GetUserById(id);
-            var AllUsers = _userService.GetAllUsers();
-            var AllFriends = _friendService.GetAllFriends();
-
             if (MainUser == null)
             {
                 return BadRequest();
@@ -174,75 +166,57 @@ namespace Social_network.Controllers
             model.AvatarURL = MainUser.AvatarURL;
             model.FriendsListForModel = new();
 
-            List<FriendsListViewModel> userwithfriends = new();
+            var usersWithFriendshipList = _friendService.GetAllFriendsQuerible(f =>
+                            (f.Status == (int)StatusFriendship.requestToFriendship || f.Status == (int)StatusFriendship.areFriends) &&
+                            ((f.FirstFriendId == id) || (f.SecondFriendId == id))).AsEnumerable();
 
-            foreach (var u in AllFriends)
+            var FreeFriends = _userService.GetAllUsersQuerible(us => 
+                        !(usersWithFriendshipList.Any(fr => fr.FirstFriend == us || fr.SecondFriend == us) || us.Id == id)).ToList();
+
+            foreach (var user in FreeFriends)
             {
-                if (u.Status == 1 || u.Status == 2)
+                model.FriendsListForModel.Add(new FriendsListViewModel
                 {
-                    if (u.Friend_oneId == id)
-                    {
-                        userwithfriends.Add(new FriendsListViewModel()
-                        {
-                             Id = u.Friend_twoId,
-                            Name = u.Friend_two.Name,
-                            AvatarURL = u.Friend_two.AvatarURL,
-                            Surname = u.Friend_two.Surname
-                        });
-                    }
-                    if (u.Friend_twoId == id)
-                    {
-                        userwithfriends.Add(new FriendsListViewModel()
-                        {
-                             Id = u.Friend_one.Id,
-                            Name = u.Friend_one.Name,
-                            AvatarURL = u.Friend_one.AvatarURL,
-                            Surname = u.Friend_one.Surname
-                        });
-                    }
-                }
-            }
-            foreach (var withfr in AllUsers)
-            {
-                if (!(userwithfriends.Any(u => u.Id == withfr.Id) || withfr.Id == id))
-                {
-                    model.FriendsListForModel.Add(new FriendsListViewModel
-                    {
-                         Id = withfr.Id,
-                        AvatarURL = withfr.AvatarURL,
-                        Name = withfr.Name,
-                        Surname = withfr.Surname
-                    });
-                }
+                    Id = user.Id,
+                    AvatarURL = user.AvatarURL,
+                    Name = user.Name,
+                    Surname = user.Surname
+                });
             }
             return View(model);
         }
 
         //Get:Friends/AddFriend/id
         [HttpGet]
-        public IActionResult AddFriend(int UserRequest)
+        public IActionResult AddFriend(int userToAddId)
         {
-            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            _friendService.CreateFriend(new Friend() { Friend_oneId = UserSender, Friend_twoId = UserRequest, Status = 1 });
+            if (_userService.GetUserById(userToAddId) == null) return BadRequest();
+
+            int myUser = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                myUser = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+
+            _friendService.CreateFriend(new Friend() { FirstFriendId = myUser, SecondFriendId = userToAddId, Status = 1 });
+
             return RedirectToAction("AddFreeFriends");
         }
         //Get:Friends/DeleteFriend/id
         [HttpGet]
-        public IActionResult DeleteFriend(int UserRequest)
+        public IActionResult DeleteFriend(int userToDeleteId)
         {
-            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            var existFrienship = _friendService.GetFriendsByTwoId(UserSender, UserRequest);
+            int myUser = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                myUser = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            var existFrienship = _friendService.GetFriendsByTwoId(myUser, userToDeleteId);
             if (existFrienship == null)
             {
-                _friendService.UpdateFriend(new() { Friend_oneId = UserRequest, Friend_twoId = UserSender, Status = 1 });
+                _friendService.UpdateFriend(new() { FirstFriendId = userToDeleteId, SecondFriendId = myUser, Status = 1 });
             }
             else
             {
                 _friendService.DeleteFriendentity(existFrienship);
                 _friendService.CreateFriend(new()
                 {
-                    Friend_oneId = UserRequest,
-                    Friend_twoId = UserSender,
+                    FirstFriendId = userToDeleteId,
+                    SecondFriendId = myUser,
                     Status = 1
                 });
             }
@@ -252,28 +226,31 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult CancelRequestFriendship( int UserRequest)
         {
-            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             Friend CancelFriendship = new();
-            CancelFriendship.Friend_oneId = UserRequest;
-            CancelFriendship.Friend_twoId = UserSender;
+            CancelFriendship.FirstFriendId = UserRequest;
+            CancelFriendship.SecondFriendId = UserSender;
             _friendService.DeleteFriendentity(CancelFriendship);
             return RedirectToAction("RequestFriends", "Friends");
         }
         [HttpGet]
         public IActionResult CancelSendFriendship(int UserRequest)
         {
-            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
+            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             Friend CancelFriendship = new();
-            CancelFriendship.Friend_oneId = UserSender;
-            CancelFriendship.Friend_twoId = UserRequest;
+            CancelFriendship.FirstFriendId = UserSender;
+            CancelFriendship.SecondFriendId = UserRequest;
             _friendService.DeleteFriendentity(CancelFriendship);
             return RedirectToAction("SendFriends", "Friends");
         }
         [HttpGet]
         public IActionResult AcceptNewFriend(int UserRequest)
         {
-            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            _friendService.UpdateFriend(new Friend() { Friend_oneId = UserRequest, Friend_twoId = UserSender, Status = 2 });
+            int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            _friendService.UpdateFriend(new Friend() { FirstFriendId = UserRequest, SecondFriendId = UserSender, Status = 2 });
             return RedirectToAction("RequestFriends", "Friends");
         }
     }
