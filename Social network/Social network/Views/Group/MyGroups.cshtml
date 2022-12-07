@@ -1,0 +1,84 @@
+﻿@model Social_network.ViewModels.UserGroupsViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 navbar-expand-md">
+    <div class="container">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups">@localizer["MyGroups"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="NewGroups">@localizer["NewGroups"]</a>
+</li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="SubmittedRequests">@localizer["Requests"]</a>
+</li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-controller="Group" asp-action="CreateGroup">@localizer["CreateGroup"]</a>
+</li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div> @localizer[ViewData["PageName"].ToString()]</div>
+<nav>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @localizer["Avatar"]
+                </th>
+                <th>
+                    @localizer["Name"]
+                </th>
+                <th>
+                    @localizer["Followers"]
+                </th>
+                <th>
+                    @localizer["CreateDate"]
+                </th>
+                <th>
+                    @localizer["Notes"]
+                </th>
+            </tr>
+        </thead>
+        @foreach (var group in Model.Groups)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="@group.GroupAvatarURL" width="15" />
+                    </td>
+                    <td>
+                        @if (User.Identity.Name == group.GroupAdminName)
+                        {
+                            <a class="bg-warning" href="/Group/GroupPage?GroupId=@group.GroupId">@group.GroupName</a>
+                        }
+                        else
+                        {
+                            @Html.ActionLink(@group.GroupName, "GroupPage", new { GroupId = group.GroupId })
+                        }
+                </td>
+                <td>
+                    @if (!group.IsClose || group.MyUserConsistInGroup)
+                    {
+                        <a class="nav-link text-dark, border-dark" asp-controller="Group" asp-action="ShowSubscribers" asp-route-id="@group.GroupId">@group.GroupCountFollowers</a>
+                    }
+                    else
+                    {
+                        @group.GroupCountFollowers
+                    }
+                </td>
+                <td>
+                    @group.GroupCreateDate.ToString("d")
+                </td>
+                <td>
+                    @group.GroupNotes
+                </td>
+            </tr>
+        </tbody>
+    }
+    </table>
+</nav>

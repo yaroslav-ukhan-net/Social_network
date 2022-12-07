@@ -1,0 +1,66 @@
+﻿@model Social_network.ViewModels.GroupsViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<table class="table">
+    <tr>
+        <td style="padding:0px" width="210px">
+            <div>
+                <img src="@Model.GroupAvatarURL" width="200" />
+            </div>
+        </td>
+        <td bgcolor="#D3EDF6" style="padding:20px">
+            <div>
+                @Model.GroupName <br style="padding:20px">
+                @localizer["CreateDate"] : @Model.GroupCreateDate.ToString("d")<br style="padding: 20px">
+                @localizer["Followers"]: @Model.GroupCountFollowers<br>
+                @localizer["Notes"] : @Model.GroupNotes<br />
+                @Html.ActionLink($"{localizer["ComeBack"].Value}", "GroupPage", new { GroupId = Model.GroupId })
+
+            </div>
+        </td>
+    </tr>
+</table>
+<div>@localizer["RequestsInGroup"] </div>
+<nav>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @localizer["Avatar"]
+                </th>
+                <th>
+                    @localizer["Name"]
+                </th>
+                <th>
+                    @localizer["Surname"]
+                </th>
+                <th>
+                    @localizer["PnomeNumber"]
+                </th>
+            </tr>
+        </thead>
+        @foreach (var user in Model.Users)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="@user.AvatarURL" width="15" />
+                    </td>
+                    <td>
+                        @user.Name
+                    </td>
+                    <td>
+                        @user.Surname
+                    </td>
+                    <td>
+                        @user.PhoneNumber
+                    </td>
+                    <td>
+                        @Html.ActionLink($"{localizer["Add"].Value}", "AddFollowerInGroup", new { GroupId = Model.GroupId, UserAddId = user.Id })
+                        @Html.ActionLink($"{localizer["Cancel"].Value}", "CancelFollowerFromGroup", new { GroupId = Model.GroupId, UserAddId = user.Id })
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</nav>

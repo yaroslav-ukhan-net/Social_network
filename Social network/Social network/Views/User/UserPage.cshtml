@@ -1,0 +1,55 @@
+﻿@model Social_network.ViewModels.UserViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<table class="table">
+    <tr>
+        <td style="padding:0px" width="210px">
+            <div>
+                <img src="@Model.AvatarURL" width="200" />
+            </div>
+        </td>
+        <td bgcolor="#D3EDF6" style="padding:20px">
+            <div>
+                @Model.Name @Model.Surname<br style="padding:20px">
+                @Localizer["BirthDate"] : @Model.BirthDate.ToString("d")<br style="padding:20px">
+                @Localizer["PhoneNumber"] : @Model.PhoneNumber<br>
+                @Localizer["Notes"] : @Model.Notes<br />
+
+                @if(User.Identity.Name == Model.Email || User.IsInRole("Admin"))
+                {
+                <a class="nav-link text-dark, border-dark" asp-controller="User" asp-action="EditMyInformation" asp-route-id="@Model.Id">@Localizer["EditMyInformation"]</a>
+                }
+            </div>
+        </td>
+    </tr>
+</table>
+<nav>
+    @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
+    {
+    <form asp-action="Send">
+
+        @Html.HiddenFor(m => Model.Id)
+        @Localizer["PublishTheNews"]:
+        <input type="text" asp-for="NewPost.Text" />
+        <input type="hidden" asp-for="NewPost.UserId" />
+        <input type="submit" value="@Localizer["SendPost"]"class="btn btn-primary" />
+    </form>
+    }
+    @foreach (var post in Model.Posts)
+    {
+        <nav>
+            @Model.Name @Model.Surname <img src="@Model.AvatarURL" width="15" /> <sub>(@post.PostTime.ToString("g"))</sub><br />
+
+            @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
+            {
+                @Html.ActionLink($"{Localizer["DeletePost"].Value}", "DeletePost", new { PostId = post.Id })
+            }
+            <div style="border: solid; padding:10px">
+                @post.Text
+            </div>
+        </nav><br />
+    }
+</nav>
+

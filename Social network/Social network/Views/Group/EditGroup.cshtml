@@ -1,0 +1,51 @@
+﻿@model Social_network.ViewModels.GroupsViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<form asp-action=@ViewData["Action"]>
+    <div>
+        @if (ViewData["Action"].ToString() == "EditGroup")
+        {
+            <h4>@localizer["EditGroup"]</h4>
+        }
+        else
+        {
+            <h4>@localizer["CreateNewGroup"]</h4>
+        }
+        <hr />
+        @Html.HiddenFor(n => n.UserIsModerator)
+        @Html.HiddenFor(n => n.GroupAdminName)
+        @Html.HiddenFor(n => n.GroupId)
+
+        <div class="form-group">
+            <label class="col-lg-2 col-form-label">@localizer["GroupName"]</label>
+            <div class="col-md-10">
+                <input asp-for="GroupName" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 col-form-label-lg">@localizer["GroupAvatarURL"]</label>
+            <div class="col-md-11">
+                <input asp-for="GroupAvatarURL" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 col-form-label-lg">@localizer["GroupNotes"]</label>
+            <div class="col-md-11">
+                <input asp-for="GroupNotes" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 col-form-label-lg">@localizer["IsClose"]</label>
+            <div class="col-md-11">
+                <p><input asp-for="IsClose" type="radio" value="true" />@localizer["Close"]</p>
+                <p><input asp-for="IsClose" type="radio" value="false" />@localizer["Open"]</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-4">
+                <input type="submit" value="@localizer["Save"]" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+</form>
