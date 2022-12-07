@@ -55,7 +55,7 @@
                         @Html.ActionLink(friend.Name + friend.Surname, "UserPage", "User", new { Id = friend.Id })
                     </td>
                     <td>
-                        @Html.ActionLink($"{Localizer["SendRequest"].Value}", "AddFriend", new { UserRequest = friend.Id })
+                        @Html.ActionLink($"{Localizer["SendRequest"].Value}", "AddFriend", new { userToAddId = friend.Id })
                     </td>
                 </tr>
             </tbody>

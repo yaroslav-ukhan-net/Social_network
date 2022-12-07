@@ -33,7 +33,6 @@
         @Html.HiddenFor(m => Model.Id)
         @Localizer["PublishTheNews"]:
         <input type="text" asp-for="NewPost.Text" />
-        <input type="hidden" asp-for="NewPost.UserId" />
         <input type="submit" value="@Localizer["SendPost"]"class="btn btn-primary" />
     </form>
     }

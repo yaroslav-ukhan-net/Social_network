@@ -30,6 +30,8 @@ namespace Social_network.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<AppUser> _userManager;
 
+        const string OwnerPagePolicy = "OwnerPagePolicy";
+
 
         public UserController(
             UserService userService, 
@@ -47,8 +49,9 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult MyPage()
         {
-            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            return RedirectToAction("UserPage", "User", new { id = id });
+            int userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            return RedirectToAction("UserPage", "User", new { id = userId });
         }
 
         //Get:User/UserPage/id
@@ -56,40 +59,32 @@ namespace Social_network.Controllers
         public IActionResult UserPage(int id)
         {
             var User = _userService.GetUserById(id);
-            if (User == null)
+            if (User == null) return NotFound();
+
+            UserViewModel model = new()
             {
-                return NotFound();
-            }
-            UserViewModel model = new UserViewModel();
+                Id = id,
+                Name = User.Name,
+                Notes = User.Notes,
+                BirthDate = User.BirthDate,
+                PhoneNumber = User.PhoneNumber,
+                Surname = User.Surname,
+                AvatarURL = User.AvatarURL,
+                Email = User.Email,
+                Posts = new List<PostViewModel>()
+            };
 
-            model.Id = id;
-            model.Name = User.Name;
-            model.Notes = User.Notes;
-            model.BirthDate = User.BirthDate;
-            model.PhoneNumber = User.PhoneNumber;
-            model.Surname = User.Surname;
-            model.AvatarURL = User.AvatarURL;
-            model.Email = User.Email;
-            model.Posts = new List<PostViewModel>();
+            var sortedPosts = _postService.GetAllPotsQuerible(post=> post.UserId == id).OrderByDescending(post=>post.PostTime);
 
-
-            var NotSortedAllPosts = _postService.GetAllPosts();
-            var SortedAllPosts = from s in NotSortedAllPosts
-                                 orderby s.PostTime descending
-                                 select s;
-
-            foreach (var post in SortedAllPosts)
+            foreach (var post in sortedPosts.ToList())
             {
-                if (post.UserId == id)
+                model.Posts.Add(new PostViewModel()
                 {
-                    model.Posts.Add(new PostViewModel()
-                    {
-                        Id = post.Id,
-                        UserId = post.UserId,
-                        Text = post.Text,
-                        PostTime = post.PostTime
-                    });
-                }
+                    Id = post.Id,
+                    UserId = post.UserId,
+                    Text = post.Text,
+                    PostTime = post.PostTime
+                });
             }
 
             return View(model);
@@ -97,27 +92,30 @@ namespace Social_network.Controllers
 
         //Post post
         [HttpPost]
-        public IActionResult Send (UserViewModel sendpost)
+        public IActionResult Send (UserViewModel sendPost)
         {
-            int Userid = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            if (sendpost.NewPost.Text == null)
+            int userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            if (sendPost.NewPost == null) throw new NullReferenceException();
+            if (sendPost.NewPost.Text == null)
             {
-                return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
+                return RedirectToAction("UserPage", new { id = sendPost.NewPost.UserId });
             }
             else
             {
-                sendpost.NewPost.PostTime = DateTime.Now;
-                sendpost.NewPost.UserId = Userid;
-                _postService.CreatePost(ToModel(sendpost.NewPost));
-                return RedirectToAction("UserPage", new { id = sendpost.NewPost.UserId });
+                sendPost.NewPost.PostTime = DateTime.Now;
+                sendPost.NewPost.UserId = userId;
+                _postService.CreatePost(ToModel(sendPost.NewPost));
+                return RedirectToAction("UserPage", new { id = sendPost.NewPost.UserId });
             }
         }
         [HttpGet]
         public async Task<IActionResult> EditMyInformation()
         {
-            int id = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            var MyUserInformation = _userService.GetUserById(id);
-            var result = await _authorizationService.AuthorizeAsync(User, MyUserInformation, "OwnerPagePolicy");
+            int userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            var MyUserInformation = _userService.GetUserById(userId);
+            var result = await _authorizationService.AuthorizeAsync(User, MyUserInformation, OwnerPagePolicy);
             if (result.Succeeded)
             {
                 return View(ToViewModel(MyUserInformation));
@@ -135,11 +133,12 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult DeletePost(int PostId) //remove post
         {
-            int UserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId;
-            var MyUser = _userService.GetUserById(UserId);
+            int userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            var MyUser = _userService.GetUserById(userId);
             var PostForRemoving = _postService.GetPostsById(PostId);
 
-            if (PostForRemoving.UserId == UserId)
+            if (PostForRemoving.UserId == userId)
             {
                 _postService.DeletePost(PostId);
                 return RedirectToAction("MyPage");

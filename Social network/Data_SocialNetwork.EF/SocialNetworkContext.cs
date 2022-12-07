@@ -21,24 +21,22 @@ namespace Data_SocialNetwork.EF
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer(_options.Value.DefaultConnectionString);
+            optionsBuilder.UseSqlServer(_options.Value.DefaultConnectionString, b=> b.MigrationsAssembly("SocialNetwork"));
             optionsBuilder.UseLazyLoadingProxies();
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Friend>().HasKey(x => new { x.Friend_oneId, x.Friend_twoId });
-
-            builder.Entity<Friend>().HasKey(f => new { f.Friend_oneId, f.Friend_twoId });
+            builder.Entity<Friend>().HasKey(x => new { x.FirstFriendId, x.SecondFriendId });
 
             builder.Entity<Friend>()
-              .HasOne(f => f.Friend_one)
-              .WithMany(mu => mu.Friend_ones)
-              .HasForeignKey(f => f.Friend_oneId);
+              .HasOne(f => f.FirstFriend)
+              .WithMany(mu => mu.FirstFriends)
+              .HasForeignKey(f => f.FirstFriendId);
 
             builder.Entity<Friend>()
-                .HasOne(f => f.Friend_two)
-                .WithMany(mu => mu.Friend_twos)
-                .HasForeignKey(f => f.Friend_twoId);
+                .HasOne(f => f.SecondFriend)
+                .WithMany(mu => mu.SecondFriends)
+                .HasForeignKey(f => f.SecondFriendId);
 
             builder.Entity<UserGroup>()
                 .HasKey(bc => new { bc.UserId, bc.GroupId });

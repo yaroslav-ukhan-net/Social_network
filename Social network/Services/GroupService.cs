@@ -3,6 +3,7 @@ using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,9 +19,13 @@ namespace Services
             _GroupRepository = repository;
             _UserRepository = repository1;
         }
-        public virtual List<Group> GetAllGroups()
+        public virtual IQueryable<Group> GetAllGroups()
         {
            return _GroupRepository.GetAll();
+        }
+        public virtual IQueryable<Group> GetAllGroupsQuerible(Expression<Func<Group, bool>> expression)
+        {
+            return _GroupRepository.GetAllQuerible(expression);
         }
         public virtual Group GetGroupById(int id)
         {

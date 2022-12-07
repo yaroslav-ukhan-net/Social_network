@@ -3,6 +3,7 @@ using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,9 +17,13 @@ namespace Services
         {
             _PostRepository = repository;
         }
-        public virtual List<Post> GetAllPosts()
+        public virtual IQueryable<Post> GetAllPosts()
         {
             return _PostRepository.GetAll();
+        }
+        public virtual IQueryable<Post> GetAllPotsQuerible(Expression<Func<Post, bool>> expression)
+        {
+            return _PostRepository.GetAllQuerible(expression);
         }
         public virtual Post GetPostsById(int PostId)
         {

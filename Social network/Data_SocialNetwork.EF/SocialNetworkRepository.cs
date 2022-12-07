@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,10 +28,10 @@ namespace Data_SocialNetwork.EF
             return entity;
         }
 
-        public List<T> GetAll()
-        {
-            return DbSet.ToList();
-        }
+        public IQueryable<T> GetAll() => DbSet;
+        //{
+        //    //return DbSet.AsQueryable();
+        //}
 
         public T GetById(int id)
         {
@@ -56,5 +58,6 @@ namespace Data_SocialNetwork.EF
             DbSet.Remove(entity);
             _context.SaveChanges();
         }
+        public IQueryable<T> GetAllQuerible(Expression<Func<T, bool>> expression) => DbSet.Where(expression);
     }
 }

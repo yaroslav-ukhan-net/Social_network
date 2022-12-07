@@ -161,7 +161,7 @@
             <input type="submit" value=@localizer["SendPost"] class="btn btn-primary" />
         </form>
     }
-    @if (!(!Model.MyUserConsistInGroup && Model.IsClose && !User.IsInRole("Admin"))) //Если не состоишь в закрытой группе то посты не отображаются
+    @if (Model.MyUserConsistInGroup || !Model.IsClose || User.IsInRole("Admin")) //Если не состоишь в закрытой группе то посты не отображаются
     {
         @foreach (var post in Model.Posts)
         {
