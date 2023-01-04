@@ -12,12 +12,10 @@ namespace Services
     public class GroupService
     {
         private readonly IRepository<Group> _GroupRepository;
-        private readonly IRepository<User> _UserRepository;
 
-        public GroupService(IRepository<Group>  repository, IRepository<User> repository1)
+        public GroupService(IRepository<Group>  repository)
         {
             _GroupRepository = repository;
-            _UserRepository = repository1;
         }
         public virtual IQueryable<Group> GetAllGroups()
         {

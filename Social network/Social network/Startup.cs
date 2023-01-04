@@ -2,26 +2,17 @@ using Data_SocialNetwork.EF;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Models;
-using NETCore.MailKit.Extensions;
-using NETCore.MailKit.Infrastructure.Internal;
 using Services;
 using Social_network.Authorization;
 using Social_network.Data;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
+using SocialNetwork.Hubs;
 
 namespace SocialNetwork
 {
@@ -45,7 +36,10 @@ namespace SocialNetwork
             services.AddScoped<PostService>();
             services.AddScoped<FriendService>();
             services.AddScoped<GroupService>();
+            services.AddScoped<ChatService>();
+            services.AddScoped<MessageService>();
 
+            services.AddSignalR();
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnectionString")));
@@ -112,9 +106,11 @@ namespace SocialNetwork
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=User}/{action=MyPage}");
+                
             });
         }
     }

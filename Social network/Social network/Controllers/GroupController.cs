@@ -312,7 +312,7 @@ namespace Social_network.Controllers
             {
                 UserGroup requestjoin = new() { UserId = UserId, GroupId = id, ConsistInGroup = true, IsModerator = false };
                 MyUser.UserGroup.Add(requestjoin);
-                _GroupService.UpdateGroup(group);
+                //_GroupService.UpdateGroup(group);
             }
             _UserService.UpdateUser(MyUser);
             return RedirectToAction("GroupPage", new { GroupId = id });
