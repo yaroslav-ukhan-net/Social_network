@@ -22,5 +22,6 @@ namespace Models
         public virtual List<Friend> FirstFriends { get; set; }
         public virtual List<Friend> SecondFriends { get; set; }
         public virtual List<UserGroup> UserGroup { get; set; }
+        public virtual List<UserChat> UserChat { get; set; }
     }
 }

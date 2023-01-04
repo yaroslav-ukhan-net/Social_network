@@ -1,0 +1,39 @@
+﻿@model SocialNetwork.ViewModels.UserChatViewModel
+
+
+
+@Html.ActionLink("Сделать новую беседу", "CreateChatGroup", "Chat")
+
+
+<table class="table table-bordered" style="border-collapse:separate">
+
+    @for (var i = 0; i < Model.UserChatsList.Count; i++)
+    {
+        @if (Model.UserChatsList[i].IsGroup)
+        {
+            <tr>
+                <td bgcolor="#FFB6C1" style="padding:0px">
+                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="ChatWithUser" asp-route-id="@Model.UserChatsList[i].Id">
+                        @Model.UserChatsList[i].Name <sub>(@Model.UserChatsList[i].LastMessage.Date.ToString("g"))</sub>
+                        <div class="modal-content">
+                            @Model.UserChatsList[i].LastMessage.Text
+                        </div>
+                    </a>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td bgcolor="#FDF5E6" style="padding:0px">
+                    <a class="nav-link text-dark" asp-controller="Chat" asp-action="ChatWithUser" asp-route-id="@Model.UserChatsList[i].Id">
+                        @Model.UserChatsList[i].Name <img src="@Model.UserChatsList[i].AvatarURL" width="15" /> <sub>(@Model.UserChatsList[i].LastMessage.Date.ToString("g"))</sub>
+                        <div class="modal-content">
+                            @Model.UserChatsList[i].LastMessage.Text
+                        </div>
+                    </a>
+                </td>
+            </tr>
+        }
+    }
+</table>
