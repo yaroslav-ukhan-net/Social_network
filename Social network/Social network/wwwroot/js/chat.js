@@ -7,8 +7,11 @@ document.getElementById("sendButton").disabled = true;
 
 
 connection.on("ReceiveMessage", function (chatsViewModel) {            //answer from server
+    var user = document.getElementById("userInput").value;
 
-    var wiersz = document.createElement("tr");
+    var mesId = chatsViewModel.lastMessage.id;
+
+    var wiersz = document.createElement("tr"); wiersz.id = mesId;
     var tdNMes = document.createElement("td");     //left td
 
     var img = document.createElement("img");    
@@ -34,44 +37,14 @@ connection.on("ReceiveMessage", function (chatsViewModel) {            //answer 
 
 
     var tdLinks = document.createElement("td");  //right td
-
-    var mesId = chatsViewModel.lastMessage.id;
-    tdLinks.innerHTML = ' <i>  <input type="button"  value="Remove" />   </i><br>';
-
-    tdLinks.addEventListener("click", function (event) {
-        var groupName = document.getElementById("groupNameInput").value;
-        var idmes = 5;
-        connection.invoke("RemoveMes", idmes, groupName).catch(function (err) {
-            return console.error(err.toString());
-        });
-        event.preventDefault();
-    });
-
-    ////
-    //document.getElementById("sendButton").addEventListener("click", function (event) {
-    //    var user = document.getElementById("userInput").value;
-    //    var message = document.getElementById("messageInput").value;
-    //    var groupName = document.getElementById("groupNameInput").value;
-    //    connection.invoke("SendMessage", groupName, user, message).catch(function (err) {
-    //        return console.error(err.toString());
-    //    });
-    //    event.preventDefault();
-    //});
-
-    //
-
-
-
-
-
+    if (chatsViewModel.lastMessage.idSender == user)
+        tdLinks.innerHTML = ' <i>  <input type="button" onclick="RemoveRowId(' + mesId + ')" value="Remove" />   </i><br>';
+    else
+        tdLinks.innerHTML = ' <i>  <input type="button" onclick="RemoveRowId(' + mesId + ')" value="Another" />   </i><br>';
     wiersz.appendChild(tdNMes);
     wiersz.appendChild(tdLinks);
     var dodac = document.getElementById("tbd");
     dodac.appendChild(wiersz);
-});
-
-connection.on("ReceiveRemove", function () {
-    this.parentElement.parentElement.deleteRow(this.parentElement.rowIndex);
 });
 
 
@@ -88,8 +61,22 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
     var groupName = document.getElementById("groupNameInput").value;
+    document.getElementById("messageInput").value = "";
     connection.invoke("SendMessage", groupName, user, message).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();
+});
+
+
+function RemoveRowId(mesId) {
+    var groupName = document.getElementById("groupNameInput").value;
+    connection.invoke("RemoveMes", mesId, groupName).catch(function (err2) {
+        return console.error(err2.toString());
+    });
+    event.preventDefault();
+}
+
+connection.on("ReceiveRemove", function (mesId) {
+    document.getElementById(mesId).remove();
 });

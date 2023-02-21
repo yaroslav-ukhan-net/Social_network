@@ -46,12 +46,14 @@ namespace SocialNetwork.Hubs
                 chatsViewModel.LastMessage.Date = newmes.Date;
                 chatsViewModel.LastMessage.Text = newmes.Text;
                 chatsViewModel.LastMessage.Id = newmes.Id;
+                chatsViewModel.LastMessage.IdSender = newmes.IdSender; //??????
                 await Clients.Group(groupName).SendAsync("ReceiveMessage", chatsViewModel);
             }
         }
-        public async Task RemoveMes(string idmes, string groupName) //+
+        public async Task RemoveMes(int mesId, string groupName) //+
         {
-            await Clients.Group(groupName).SendAsync("ReceiveRemove");
+            _MessageService.RemoveMessageById(mesId);
+            await Clients.Group(groupName).SendAsync("ReceiveRemove", mesId);
         }
 
             public async Task JoinRoom(string groupName)

@@ -1,0 +1,102 @@
+﻿@model SocialNetwork.ViewModels.SettingsVievModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<form asp-action="Privacy" >
+    <div class="content_block">
+        <h2 class="content_block_h2">
+            <div>My profile</div>
+        </h2>
+        <div class="row_for_property">
+            <div class="left_property">Who can view my phone number</div>
+            <div class="right_property">
+                <select asp-for="SeeMyPhone">
+                    <option value="2">All</option>
+                    <option value="1">Only Friends</option>
+                    <option value="0">Neither</option>
+                </select>
+            </div>
+        </div>
+        <div class="row_for_property">
+            <div class="left_property">Who can view my list of friends</div>
+            <div class="right_property">
+                <select asp-for="SeeMyFriends">
+                    <option value="2">All</option>
+                    <option value="1">Only Friends</option>
+                    <option value="0">Neither</option>
+                </select>
+            </div>
+        </div>
+        <div class="row_for_property">
+            <div class="left_property">Who can view my list of groups</div>
+            <div class="right_property">
+                <select asp-for="SeeMyGroups">
+                    <option value="2">All</option>
+                    <option value="1">Only Friends</option>
+                    <option value="0">Neither</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="content_block">
+        <h2 class="content_block_h2">
+            <div>My posts</div>
+        </h2>
+        <div class="row_for_property">
+                <div class="left_property">Who can view posts on my wall</div>
+                <div class="right_property">
+                    <select asp-for="SeeMyPosts">
+                        <option value="2">All</option>
+                        <option value="1">Only Friends</option>
+                        <option value="0">Neither</option>
+                    </select>
+                </div>
+        </div>
+        <div class="row_for_property">
+            <div class="left_property">Who can post to my wall</div>
+                <div class="right_property">
+                    <select asp-for="LeavePosts">
+                        <option value="2">All</option>
+                        <option value="1">Only Friends</option>
+                        <option value="0">Neither</option>
+                     </select>
+                </div>
+        </div>
+    </div>
+
+    <div class="content_block">
+        <h2 class="content_block_h2">
+            <div>Contact with me</div>
+        </h2>
+        <div class="row_for_property">
+            <div class="left_property">Who can send me private message</div>
+            <div class="right_property">
+                <select asp-for="WriteToMe">
+                    <option value="2">All</option>
+                    <option value="1">Only Friends</option>
+                    <option value="0">Neither</option>
+                </select>
+            </div>
+        </div>
+        <div class="row_for_property">
+            <div class="left_property">Who can send me chat invites</div>
+            <div class="right_property">
+                <select asp-for="ChatInvites">
+                    <option value="2">All</option>
+                    <option value="1">Only Friends</option>
+                    <option value="0">Neither</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div style="padding:11px 0 15px">
+        <div class="left_property"></div>
+            <div class="right_property">
+                <div class="col-lg-4 ">
+                <input type="submit" value="@localizer["Save"]" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+ </form>

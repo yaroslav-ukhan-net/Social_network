@@ -18,5 +18,14 @@ namespace Social_network.ViewModels
         public Post NewPost { get; set; }
         public List<PostViewModel> Posts { get; set; }
         public string Email { get; set; }
+        public int friendshipStatus { get; set; }
+
+    }
+    public enum friendshipStatusEnum
+    {
+        notFriends,
+        requestForUser,
+        areFriends,
+        requestFromUser
     }
 }

@@ -11,6 +11,7 @@
     <title> @localizer["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/MyStyles.css" />
 </head>
 <body>
     <header style="background-color: #e3f2fd;">
@@ -54,7 +55,7 @@
                                         </tr>
                                         <tr>
                                             <td class="alert-dark" style="padding:0px">
-                                                <a class="nav-link text-dark" asp-controller="Chat" asp-action="">{ }</a>
+                                                <a class="nav-link text-dark" asp-controller="Settings" asp-action="Privacy">@localizer["Privacy"]</a>
                                             </td>
                                         </tr>
                                         <tr>

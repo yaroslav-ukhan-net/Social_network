@@ -12,14 +12,14 @@
     <tbody id="tbd">
         @for (var i = 0; i < Model.Messages.Count; i++)
         {
-            <tr >
+            <tr id="@Model.Messages[i].Id">
 
                 <td  style="
     padding-top: 0px;
     padding-left: 10px;
     padding-right: 0px;
     padding-bottom: 0px;
-"> <div>
+">
                     @if (Model.Messages[i].WithAnswer)
                     {
                         <i style="color: #128DFF ">↳@@@Model.Messages[i].AnswerText</i>
@@ -46,7 +46,7 @@
                         <i>
                             Delete (
                             @Html.ActionLink("for me/", "DeleteMe", "Chat", new { IdChat = Model.Id, Id = Model.Messages[i].Id })
-                            @Html.ActionLink("for all", "DeleteAll", "Chat", new { IdChat = Model.Id, Id = Model.Messages[i].Id })
+                            <input type="button" onclick="RemoveRowId(@Model.Messages[i].Id)" value="for all" />
                             )
                         </i><br />
                     }

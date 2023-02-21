@@ -5,7 +5,9 @@
 
 @{
     ViewData["Title"] = Localizer["DoingsWithFriends"];
+    var returnUrl = string.IsNullOrWhiteSpace(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
 }
+
 
 <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 navbar-expand-md">
     <div class="container">
@@ -57,19 +59,18 @@
                     <td>
                         @if (ViewData["Doing"].ToString() == "DoingsWithFriends")
                         {
-                            @Html.ActionLink($"{Localizer["Delete"].Value}", "DeleteFriend", new { userToDeleteId = friend.Id })
+                            <a asp-controller="Friends" asp-route-userToDeleteId="@friend.Id" asp-route-returnUrl="@returnUrl" asp-action="DeleteFriend">  @Localizer["Delete friendship"] </a>
                         }
 
                         @if (ViewData["Doing"].ToString() == "RequestFriends")
                         {
-                            @Html.ActionLink($"{Localizer["Cancel"].Value}", "CancelRequestFriendship", new { UserRequest = friend.Id }) @(" | ")
-                            
-                            @Html.ActionLink($"{Localizer["Add"].Value}", "AcceptNewFriend", new { UserRequest = friend.Id })
+                            <a asp-controller="Friends" asp-route-UserRequest="@friend.Id" asp-route-returnUrl="@returnUrl" asp-action="CancelRequestFriendship">  @Localizer["Cancel"] </a> @(" | ")
+                            <a asp-controller="Friends" asp-route-UserRequest="@friend.Id" asp-route-returnUrl="@returnUrl" asp-action="AcceptNewFriend">  @Localizer["Add"] </a>
                         }
 
                         @if (ViewData["Doing"].ToString() == "SendFriends")
                         {
-                            @Html.ActionLink($"{Localizer["Cancel"].Value}", "CancelSendFriendship", new { UserRequest = friend.Id })
+                            <a asp-controller="Friends" asp-route-UserRequest="@friend.Id" asp-route-returnUrl="@returnUrl" asp-action="CancelSendFriendship">  @Localizer["Cancel"] </a>
                         }
 
                     </td>

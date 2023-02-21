@@ -38,6 +38,7 @@ namespace SocialNetwork
             services.AddScoped<GroupService>();
             services.AddScoped<ChatService>();
             services.AddScoped<MessageService>();
+            services.AddScoped<SettingsService>();
 
             services.AddSignalR();
 

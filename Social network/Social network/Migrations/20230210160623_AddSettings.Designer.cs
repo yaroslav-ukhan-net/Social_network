@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SocialNetwork.Migrations
 {
     [DbContext(typeof(SocialNetworkContext))]
-    [Migration("20221223161227_CreateChat")]
-    partial class CreateChat
+    [Migration("20230210160623_AddSettings")]
+    partial class AddSettings
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -159,6 +159,42 @@ namespace SocialNetwork.Migrations
                     b.ToTable("Posts");
                 });
 
+            modelBuilder.Entity("Models.Models.Setting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AddToGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeavePosts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SeeMyFriends")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SeeMyGroups")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SeeMyPosts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WriteToMe")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Models.Models.UserChat", b =>
                 {
                     b.Property<int>("UserId")
@@ -166,6 +202,9 @@ namespace SocialNetwork.Migrations
 
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("ConsistInGroupChat")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsModerator")
                         .HasColumnType("bit");
@@ -272,6 +311,17 @@ namespace SocialNetwork.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Models.Models.Setting", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Settings")
+                        .HasForeignKey("Models.Models.Setting", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Models.Models.UserChat", b =>
                 {
                     b.HasOne("Models.Models.Chat", "Chat")
@@ -331,6 +381,8 @@ namespace SocialNetwork.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("SecondFriends");
+
+                    b.Navigation("Settings");
 
                     b.Navigation("UserChat");
 
