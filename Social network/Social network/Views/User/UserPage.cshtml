@@ -41,6 +41,26 @@
                               @Model.PhoneNumber<br>
                         </td>
                     <tr />
+                    @if(true){ //fr
+                        <tr>
+                            <td style="padding:5px">
+                                @localizer["Friends"]
+                            </td>
+                            <td style="padding:5px">
+                                  number))
+                            </td>
+                        </tr>
+                    } 
+                    @if(true){ //gr
+                        <tr>
+                            <td style="padding:5px">
+                                @localizer["Groups"]
+                            </td>
+                            <td style="padding:5px">
+                                  number2))
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <td style="padding:5px">
                             @localizer["Actions"]
@@ -86,9 +106,10 @@
                         </td>
                     </tr>
                 </table>
-
+                
             </div>
         </td>
+        
     </tr>
 </table>
 
@@ -113,8 +134,10 @@
             {
                 @Html.ActionLink($"{localizer["DeletePost"].Value}", "DeletePost", new { PostId = post.Id })
             }
-            <div style="border: solid; padding:10px">
-                @post.Text
+            <div class="UserPosts">
+                <div class="WithTransfers">
+                    @post.Text      
+                </div>
             </div>
         </nav><br />
     }
