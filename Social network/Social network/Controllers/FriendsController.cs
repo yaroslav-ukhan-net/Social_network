@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Models.Models;
 using Services;
 using Social_network.Data;
@@ -41,6 +42,7 @@ namespace Social_network.Controllers
             model.Surname = userMain.Surname;
             model.AvatarURL = userMain.AvatarURL;
             model.FriendsListForModel = new();
+
 
             var userFirstInFrienship = _friendService.GetAllFriendsQuerible(c =>
                ((c.Status == (int)StatusFriendship.areFriends) &&

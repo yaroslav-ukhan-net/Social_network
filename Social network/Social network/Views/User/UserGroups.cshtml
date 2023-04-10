@@ -1,0 +1,44 @@
+﻿@model Social_network.ViewModels.GroupViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+
+<div class="AllFriendsBorder">
+    <div class="AllFriends">
+        All groups @Model.Groups.Count
+    </div>
+    <a class="BackToProfileBorder" asp-controller="User" asp-action="UserPage" asp-route-Id="@Model.Id">
+        <div>
+            <div class="leftImg">
+                <img src="@Model.AvatarURL" width="42" height="42" />
+            </div>
+            @Model.Name @Model.Surname <br>
+            <div class="BackToProfile">
+                Back to profile
+            </div>
+        </div>
+    </a>
+</div>
+<div>
+    <form asp-action="SearchingFriends">
+        <div class="SearchingFriendsBorder">
+            <input class="SearchingFriends" type="text" placeholder="Search group" /> <button class="SearchingFriends">Search</button>
+        </div>
+    </form>
+</div>
+
+
+
+@foreach (var group in Model.Groups)
+{
+    <div class="friends_user_row">
+        <div>
+            <img src="@group.GroupAvatarURL" width="80" height="80" />
+        </div>
+        <div class="friends_user_row_name">
+            @Html.ActionLink(group.GroupName, "GroupPage", "Group", new { GroupId = group.GroupId }) <br>
+            followers: @group.GroupCountFollowers
+        </div>
+    </div>
+}

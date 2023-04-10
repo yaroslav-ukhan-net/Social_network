@@ -1,0 +1,45 @@
+﻿@model Social_network.ViewModels.FriendsViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<div class="AllFriendsBorder">
+    <div class="AllFriends">
+        All friends @Model.FriendsListForModel.Count
+    </div>
+    <a class="BackToProfileBorder" asp-controller="User" asp-action="UserPage" asp-route-Id="@Model.Id">
+        <div >
+            <div class="leftImg">
+            <img src="@Model.AvatarURL" width="42" height="42" />
+            </div>
+            @Model.Name @Model.Surname <br>
+            <div class="BackToProfile">
+                Back to profile
+            </div>
+        </div>
+    </a>
+</div>
+<div>
+    <form asp-action="SearchingFriends">
+        <div class="SearchingFriendsBorder">
+            <input class="SearchingFriends" type="text" placeholder="Search friends" /> <button class="SearchingFriends">Search</button>
+        </div>
+    </form>
+</div>
+
+
+
+@foreach (var friend in Model.FriendsListForModel)
+{
+    <div class="friends_user_row">
+        <div>
+            <img src="@friend.AvatarURL" width="80" height="80" />
+        </div>
+        <div class="friends_user_row_name">
+            @Html.ActionLink(friend.Name +" "+ friend.Surname, "UserPage", "User", new { Id = friend.Id }) <br>
+            <form asp-controller="Chat" asp-action="CreateOrChooseChat" method="post" asp-route-foreignUserId="@friend.Id">
+                <button class="SendSms" type="button" onclick="this.form.submit();">@Localizer["SendSms"]</button>
+            </form>
+        </div>
+    </div>
+}

@@ -113,7 +113,7 @@ namespace SocialNetwork.Controllers
                 userId = _UserManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
 
             var ch = _ChatService.GetChatById(id);
-
+            if(ch == null) return NotFound();
 
             ChatsViewModel chatsViewModel = new();
             chatsViewModel.Id = ch.Id;

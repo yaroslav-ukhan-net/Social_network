@@ -38,7 +38,13 @@
                             @localizer["PhoneNumber"]
                         </td>
                         <td style="padding:5px">
+                            @if(Model.pageAccess.AccessSeeMyPhone)
+                            {
                               @Model.PhoneNumber<br>
+                            }else
+                            {
+                                <p>⚠hidden by privacy settings</p>
+                            }
                         </td>
                     <tr />
                     @if(true){ //fr
@@ -47,7 +53,15 @@
                                 @localizer["Friends"]
                             </td>
                             <td style="padding:5px">
-                                  number))
+                                @if (Model.pageAccess.AccessSeeMyFriends)
+                                {
+                                     <a asp-controller="User" asp-action="UserFriends" asp-route-userPageId="@Model.Id"> Show friends</a>
+                                }
+                                else
+                                {
+                                     <p>⚠hidden by privacy settings</p>
+                                }
+                                
                             </td>
                         </tr>
                     } 
@@ -57,7 +71,7 @@
                                 @localizer["Groups"]
                             </td>
                             <td style="padding:5px">
-                                  number2))
+                                <a asp-controller="User" asp-action="UserGroups" asp-route-userPageId="@Model.Id"> Show groups</a>
                             </td>
                         </tr>
                     }

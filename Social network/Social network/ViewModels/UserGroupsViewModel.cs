@@ -9,6 +9,7 @@ namespace Social_network.ViewModels
 {
     public class UserGroupsViewModel
     {
+        public int userId { get; set; }
         public virtual List<GroupsViewModel> Groups { get; set; }
     }
 }

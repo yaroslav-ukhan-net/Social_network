@@ -43,3 +43,75 @@
     word-wrap: break-word;
     hyphens: auto;
 }
+.AllFriends {
+    color: #346297;
+    background-color: #ffffff;
+    border-color: #dce1e6;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 4%), 0 0 4px rgb(0 0 0 / 6%);
+    border-radius: 8px 8px;
+    padding: 2px 7px;
+    font-size : 18px;
+    height : 33px;
+    margin: 10px 60px 0 0;
+}
+.AllFriendsBorder {
+    position: relative;
+    display: flex;
+    margin: 0;
+    padding: 18px 20px;
+}
+.SearchingFriends {
+    border: 1px solid #d3d9de;
+}
+.SearchingFriendsBorder {
+    padding: 15px;
+    display: flex;
+
+}
+.friends_user_row {
+    padding: 0 20px;
+    display: -webkit-box;
+    border-top: 1px solid #dce1e6;
+
+}
+.friends_user_row_name {
+    padding: 10px 10px 0 5px;
+}
+.SendSms {
+    font-size: 12px;
+    border: 2px solid #d3d9de;
+    margin: 6px 0 0 2px;
+}
+.BackToProfileBorder {
+    display: -webkit-box;
+    background: rgba(174, 183, 194, 0.12);
+    border-radius: 12px;
+    padding: 10px 10px 10px;
+    border-color: black;
+}
+.BackToProfile {
+    color: #626d7a;
+    font-size: 12.5px;
+    line-height: 16px;
+}
+.leftImg{
+    float:left;
+    padding: 0 10px 0 0;
+}
+.BackToProfileName {
+    line-height: 16px;
+}
+.first{
+    float:left;
+    text-align: justify;
+}
+.second {
+    text-align: justify;
+    white-space: nowrap;
+    white-space: pre-line;
+    white-space: pre-wrap;
+
+}
+.mytable{
+    border:solid 5px;
+}
