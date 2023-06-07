@@ -18,9 +18,11 @@ namespace Models
         public DateTime BirthDate { get; set; }
         public  string  PhoneNumber { get; set; }
         public string Notes { get; set; }
+        public virtual Setting Settings { get; set; }
         public virtual List<Post> Posts { get; set; }
         public virtual List<Friend> FirstFriends { get; set; }
         public virtual List<Friend> SecondFriends { get; set; }
         public virtual List<UserGroup> UserGroup { get; set; }
+        public virtual List<UserChat> UserChat { get; set; }
     }
 }

@@ -3,10 +3,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SocialNetwork.Migrations
 {
-    public partial class fixNamingFriends : Migration
+    public partial class MyNewDBData : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Chats",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsGroup = table.Column<bool>(type: "bit", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminId = table.Column<int>(type: "int", nullable: false),
+                    AvatarURL = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chats", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
@@ -45,6 +61,32 @@ namespace SocialNetwork.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdSender = table.Column<int>(type: "int", nullable: false),
+                    ChatId = table.Column<int>(type: "int", nullable: false),
+                    IsVisible = table.Column<bool>(type: "bit", nullable: false),
+                    WithAnswer = table.Column<bool>(type: "bit", nullable: false),
+                    AnswerText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Edited = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Chats_ChatId",
+                        column: x => x.ChatId,
+                        principalTable: "Chats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Friends",
                 columns: table => new
                 {
@@ -60,13 +102,13 @@ namespace SocialNetwork.Migrations
                         column: x => x.FirstFriendId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Friends_Users_SecondFriendId",
                         column: x => x.SecondFriendId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -91,6 +133,32 @@ namespace SocialNetwork.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Posts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserChat",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ChatId = table.Column<int>(type: "int", nullable: false),
+                    IsModerator = table.Column<bool>(type: "bit", nullable: false),
+                    ConsistInGroupChat = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserChat", x => new { x.UserId, x.ChatId });
+                    table.ForeignKey(
+                        name: "FK_UserChat_Chats_ChatId",
+                        column: x => x.ChatId,
+                        principalTable: "Chats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserChat_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -129,6 +197,11 @@ namespace SocialNetwork.Migrations
                 column: "SecondFriendId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Messages_ChatId",
+                table: "Messages",
+                column: "ChatId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Posts_GroupId",
                 table: "Posts",
                 column: "GroupId");
@@ -137,6 +210,11 @@ namespace SocialNetwork.Migrations
                 name: "IX_Posts_UserId",
                 table: "Posts",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserChat_ChatId",
+                table: "UserChat",
+                column: "ChatId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserGroup_GroupId",
@@ -150,10 +228,19 @@ namespace SocialNetwork.Migrations
                 name: "Friends");
 
             migrationBuilder.DropTable(
+                name: "Messages");
+
+            migrationBuilder.DropTable(
                 name: "Posts");
 
             migrationBuilder.DropTable(
+                name: "UserChat");
+
+            migrationBuilder.DropTable(
                 name: "UserGroup");
+
+            migrationBuilder.DropTable(
+                name: "Chats");
 
             migrationBuilder.DropTable(
                 name: "Groups");

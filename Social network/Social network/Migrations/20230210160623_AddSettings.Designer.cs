@@ -4,14 +4,16 @@ using Data_SocialNetwork.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SocialNetwork.Migrations
 {
     [DbContext(typeof(SocialNetworkContext))]
-    partial class SocialNetworkContextModelSnapshot : ModelSnapshot
+    [Migration("20230210160623_AddSettings")]
+    partial class AddSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,11 +275,13 @@ namespace SocialNetwork.Migrations
                     b.HasOne("Models.User", "FirstFriend")
                         .WithMany("FirstFriends")
                         .HasForeignKey("FirstFriendId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Models.User", "SecondFriend")
                         .WithMany("SecondFriends")
                         .HasForeignKey("SecondFriendId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FirstFriend");

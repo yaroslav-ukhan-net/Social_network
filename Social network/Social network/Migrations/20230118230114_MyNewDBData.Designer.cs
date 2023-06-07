@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SocialNetwork.Migrations
 {
     [DbContext(typeof(SocialNetworkContext))]
-    [Migration("20221204224030_fixNamingFriends")]
-    partial class fixNamingFriends
+    [Migration("20230118230114_MyNewDBData")]
+    partial class MyNewDBData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,30 @@ namespace SocialNetwork.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Models.Models.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AvatarURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsGroup")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Chats");
+                });
 
             modelBuilder.Entity("Models.Models.Friend", b =>
                 {
@@ -69,6 +93,44 @@ namespace SocialNetwork.Migrations
                     b.ToTable("Groups");
                 });
 
+            modelBuilder.Entity("Models.Models.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AnswerText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Edited")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IdSender")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("WithAnswer")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("Models.Models.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -95,6 +157,27 @@ namespace SocialNetwork.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Models.Models.UserChat", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ConsistInGroupChat")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsModerator")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "ChatId");
+
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("UserChat");
                 });
 
             modelBuilder.Entity("Models.Models.UserGroup", b =>
@@ -156,18 +239,25 @@ namespace SocialNetwork.Migrations
                     b.HasOne("Models.User", "FirstFriend")
                         .WithMany("FirstFriends")
                         .HasForeignKey("FirstFriendId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Models.User", "SecondFriend")
                         .WithMany("SecondFriends")
                         .HasForeignKey("SecondFriendId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FirstFriend");
 
                     b.Navigation("SecondFriend");
+                });
+
+            modelBuilder.Entity("Models.Models.Message", b =>
+                {
+                    b.HasOne("Models.Models.Chat", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Models.Models.Post", b =>
@@ -181,6 +271,25 @@ namespace SocialNetwork.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.Models.UserChat", b =>
+                {
+                    b.HasOne("Models.Models.Chat", "Chat")
+                        .WithMany("UserChat")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.User", "User")
+                        .WithMany("UserChat")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.Models.UserGroup", b =>
@@ -202,6 +311,13 @@ namespace SocialNetwork.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Models.Models.Chat", b =>
+                {
+                    b.Navigation("Messages");
+
+                    b.Navigation("UserChat");
+                });
+
             modelBuilder.Entity("Models.Models.Group", b =>
                 {
                     b.Navigation("Posts");
@@ -216,6 +332,8 @@ namespace SocialNetwork.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("SecondFriends");
+
+                    b.Navigation("UserChat");
 
                     b.Navigation("UserGroup");
                 });

@@ -18,7 +18,9 @@ using Social_network.Data;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Http; //test pull request
+using Microsoft.AspNetCore.Http;
+using SocialNetwork.CheckingAccess;
+using SocialNetwork.ViewModels;
 
 namespace Social_network.Controllers
 {
@@ -29,26 +31,36 @@ namespace Social_network.Controllers
         private readonly PostService _postService;
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<AppUser> _userManager;
+        private readonly FriendService _friendService;
+        private readonly GroupService _groupService;
 
         const string OwnerPagePolicy = "OwnerPagePolicy";
 
 
         public UserController(
-            UserService userService, 
-            PostService postService, 
-            IAuthorizationService authorizationService, 
-            UserManager<AppUser> userManager
+            UserService userService,
+            PostService postService,
+            IAuthorizationService authorizationService,
+            UserManager<AppUser> userManager,
+            FriendService friendService,
+            GroupService groupService
             )
         {
             _userService = userService;
             _postService = postService;
             _userManager = userManager;
             _authorizationService = authorizationService;
+            _friendService = friendService;
+            _groupService = groupService;
         }
 
         [HttpGet]
         public IActionResult MyPage()
         {
+
+            
+
+
             int userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             return RedirectToAction("UserPage", "User", new { id = userId });
@@ -58,33 +70,47 @@ namespace Social_network.Controllers
         [HttpGet]
         public IActionResult UserPage(int id)
         {
-            var User = _userService.GetUserById(id);
-            if (User == null) return NotFound();
+            bool myFriend = false;
+            int myUserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                myUserId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            var userPage = _userService.GetUserById(id);
+            if (userPage == null) return NotFound();
 
             UserViewModel model = new()
             {
                 Id = id,
-                Name = User.Name,
-                Notes = User.Notes,
-                BirthDate = User.BirthDate,
-                PhoneNumber = User.PhoneNumber,
-                Surname = User.Surname,
-                AvatarURL = User.AvatarURL,
-                Email = User.Email,
-                Posts = new List<PostViewModel>()
+                Name = userPage.Name,
+                Notes = userPage.Notes,
+                BirthDate = userPage.BirthDate,
+                PhoneNumber = userPage.PhoneNumber,
+                Surname = userPage.Surname,
+                AvatarURL = userPage.AvatarURL,
+                Email = userPage.Email,
+                Posts = new List<PostViewModel>(),
+                pageAccess = new()
             };
 
-            var sortedPosts = _postService.GetAllPotsQuerible(post=> post.UserId == id).OrderByDescending(post=>post.PostTime);
 
-            foreach (var post in sortedPosts.ToList())
+            model.friendshipStatus = CheckingAccess.CheckFriendship(myUserId, id, _friendService);
+            if (model.friendshipStatus == (int)friendshipStatusEnum.areFriends)
             {
-                model.Posts.Add(new PostViewModel()
+                myFriend = true;
+            }
+            model.pageAccess = CheckingAccess.CheckAccess(myUserId, id, userPage, myFriend);
+
+            if (model.pageAccess.AccessSeeMyPosts) //access to see posts
+            {
+                var sortedPosts = _postService.GetAllPotsQuerible(post => post.UserId == id).OrderByDescending(post => post.PostTime);
+                foreach (var post in sortedPosts.ToList())
                 {
-                    Id = post.Id,
-                    UserId = post.UserId,
-                    Text = post.Text,
-                    PostTime = post.PostTime
-                });
+                    model.Posts.Add(new PostViewModel()
+                    {
+                        Id = post.Id,
+                        UserId = post.UserId,
+                        Text = post.Text,
+                        PostTime = post.PostTime
+                    });
+                }
             }
 
             return View(model);
@@ -92,7 +118,7 @@ namespace Social_network.Controllers
 
         //Post post
         [HttpPost]
-        public IActionResult Send (UserViewModel sendPost)
+        public IActionResult Send(UserViewModel sendPost)
         {
             int userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 userId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
@@ -127,7 +153,7 @@ namespace Social_network.Controllers
         public IActionResult EditMyInformation(UserViewModel userView)
         {
             _userService.UpdateUser(ToModel(userView));
-            return RedirectToAction("MyPage","User");
+            return RedirectToAction("MyPage", "User");
         }
 
         [HttpGet]
@@ -157,16 +183,16 @@ namespace Social_network.Controllers
                 Notes = user.Notes,
                 PhoneNumber = user.PhoneNumber,
                 Surname = user.Surname,
-                 Email = user.Email
+                Email = user.Email
             };
         }
         private Post ToModel(Post postView)
         {
             return new Post()
             {
-                 PostTime=postView.PostTime,
-                  Text = postView.Text,
-                   UserId = postView.UserId
+                PostTime = postView.PostTime,
+                Text = postView.Text,
+                UserId = postView.UserId
             };
         }
         private User ToModel(UserViewModel userView)
@@ -180,7 +206,7 @@ namespace Social_network.Controllers
                 PhoneNumber = userView.PhoneNumber,
                 Surname = userView.Surname,
                 Notes = userView.Notes,
-                 Email = userView.Email
+                Email = userView.Email
             };
         }
         [HttpGet]
@@ -196,5 +222,111 @@ namespace Social_network.Controllers
             //return LocalRedirect(returnUrl);
             return RedirectToAction("MyPage");
         }
+        [HttpGet]
+        public IActionResult UserFriends(int userPageId)
+        {
+            int myId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                myId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            var pageUser = _userService.GetUserById(userPageId);
+            if (pageUser == null) return NotFound();
+
+
+            FriendsViewModel model = new();
+            model.Id = userPageId;
+            model.Name = pageUser.Name;
+            model.Surname = pageUser.Surname;
+            model.AvatarURL = pageUser.AvatarURL;
+            model.FriendsListForModel = new();
+
+
+            int friendshipStatus = CheckingAccess.CheckFriendship(myId, userPageId, _friendService);
+            bool myFriend = false;
+            if (friendshipStatus == (int)friendshipStatusEnum.areFriends)
+            {
+                myFriend = true;
+            }
+            PageAccess pageAccess = CheckingAccess.CheckAccess(myId, userPageId, pageUser, myFriend);
+            if (!pageAccess.AccessSeeMyFriends)
+            {
+                return View(model);
+            }
+
+
+            var userFirstInFrienship = _friendService.GetAllFriendsQuerible(c =>
+               ((c.Status == (int)StatusFriendship.areFriends) &&
+               (c.FirstFriendId == userPageId))).ToList();
+            foreach (var u in userFirstInFrienship)
+            {
+                model.FriendsListForModel.Add(new FriendsListViewModel()
+                {
+                    Id = u.SecondFriendId,
+                    Name = u.SecondFriend.Name,
+                    AvatarURL = u.SecondFriend.AvatarURL,
+                    Surname = u.SecondFriend.Surname
+                });
+            }
+
+            var userSecondInFrienship = _friendService.GetAllFriendsQuerible(c =>
+               ((c.Status == (int)StatusFriendship.areFriends) &&
+               (c.SecondFriendId == userPageId))).ToList();
+            foreach (var u in userSecondInFrienship)
+            {
+                model.FriendsListForModel.Add(new FriendsListViewModel()
+                {
+                    Id = u.FirstFriend.Id,
+                    Name = u.FirstFriend.Name,
+                    AvatarURL = u.FirstFriend.AvatarURL,
+                    Surname = u.FirstFriend.Surname
+                });
+            }
+
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult UserGroups(int userPageId)
+        {
+            int myId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
+                myId = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
+            var pageUser = _userService.GetUserById(userPageId);
+            if (pageUser == null) return NotFound();
+
+
+            GroupViewModel model = new();
+            model.AvatarURL = pageUser.AvatarURL;
+            model.Surname = pageUser.Surname;
+            model.Name = pageUser.Name;
+            model.Id = userPageId;
+            model.Groups = new();
+
+
+            int friendshipStatus = CheckingAccess.CheckFriendship(myId, userPageId, _friendService);
+            bool myFriend = false;
+            if (friendshipStatus == (int)friendshipStatusEnum.areFriends)
+            {
+                myFriend = true;
+            }
+            PageAccess pageAccess = CheckingAccess.CheckAccess(myId, userPageId, pageUser, myFriend);
+            if (!pageAccess.AccessSeeMyGroups)
+            {
+                return View(model);
+            }
+
+            var pageGroups = _groupService.GetAllGroupsQuerible(g => g.UserGroup.Any(us => us.User == pageUser && us.ConsistInGroup)).ToList();
+
+            foreach (var group in pageGroups)
+            {
+                model.Groups.Add(new GroupsViewModel()
+                {
+                    GroupAvatarURL = group.AvatarURL,
+                    GroupCountFollowers = group.CountFollowers,
+                    GroupId = group.Id,
+                    GroupName = group.Name
+                });
+            }
+
+
+            return View(model);
+        }
+
     }
 }

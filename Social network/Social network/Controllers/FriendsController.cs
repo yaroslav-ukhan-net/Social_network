@@ -7,10 +7,8 @@ using Services;
 using Social_network.Data;
 using Social_network.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+
 
 namespace Social_network.Controllers
 {
@@ -44,6 +42,7 @@ namespace Social_network.Controllers
             model.Surname = userMain.Surname;
             model.AvatarURL = userMain.AvatarURL;
             model.FriendsListForModel = new();
+
 
             var userFirstInFrienship = _friendService.GetAllFriendsQuerible(c =>
                ((c.Status == (int)StatusFriendship.areFriends) &&
@@ -188,7 +187,7 @@ namespace Social_network.Controllers
 
         //Get:Friends/AddFriend/id
         [HttpGet]
-        public IActionResult AddFriend(int userToAddId)
+        public IActionResult AddFriend(int userToAddId, string returnUrl)
         {
             if (_userService.GetUserById(userToAddId) == null) return BadRequest();
 
@@ -197,11 +196,11 @@ namespace Social_network.Controllers
 
             _friendService.CreateFriend(new Friend() { FirstFriendId = myUser, SecondFriendId = userToAddId, Status = 1 });
 
-            return RedirectToAction("AddFreeFriends");
+            return LocalRedirect(returnUrl);
         }
         //Get:Friends/DeleteFriend/id
         [HttpGet]
-        public IActionResult DeleteFriend(int userToDeleteId)
+        public IActionResult DeleteFriend(int userToDeleteId, string returnUrl)
         {
             int myUser = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 myUser = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
@@ -220,11 +219,11 @@ namespace Social_network.Controllers
                     Status = 1
                 });
             }
-            return RedirectToAction("DoingsWithFriends", "Friends");
+            return LocalRedirect(returnUrl);
         }
         //ViewData["Action"] = "CancelFriendship";
         [HttpGet]
-        public IActionResult CancelRequestFriendship( int UserRequest)
+        public IActionResult CancelRequestFriendship( int UserRequest, string returnUrl)
         {
             int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
@@ -232,10 +231,10 @@ namespace Social_network.Controllers
             CancelFriendship.FirstFriendId = UserRequest;
             CancelFriendship.SecondFriendId = UserSender;
             _friendService.DeleteFriendentity(CancelFriendship);
-            return RedirectToAction("RequestFriends", "Friends");
+            return LocalRedirect(returnUrl);
         }
         [HttpGet]
-        public IActionResult CancelSendFriendship(int UserRequest)
+        public IActionResult CancelSendFriendship(int UserRequest, string returnUrl)
         {
             int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
@@ -243,15 +242,15 @@ namespace Social_network.Controllers
             CancelFriendship.FirstFriendId = UserSender;
             CancelFriendship.SecondFriendId = UserRequest;
             _friendService.DeleteFriendentity(CancelFriendship);
-            return RedirectToAction("SendFriends", "Friends");
+            return LocalRedirect(returnUrl);
         }
         [HttpGet]
-        public IActionResult AcceptNewFriend(int UserRequest)
+        public IActionResult AcceptNewFriend(int UserRequest, string returnUrl)
         {
             int UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 UserSender = _userManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
             _friendService.UpdateFriend(new Friend() { FirstFriendId = UserRequest, SecondFriendId = UserSender, Status = 2 });
-            return RedirectToAction("RequestFriends", "Friends");
+            return LocalRedirect(returnUrl);
         }
     }
 }

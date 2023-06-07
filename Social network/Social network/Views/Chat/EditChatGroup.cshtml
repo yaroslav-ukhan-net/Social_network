@@ -1,0 +1,58 @@
+﻿@model SocialNetwork.ViewModels.ChatsViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<form asp-action=@ViewData["Action"]>
+    <div>
+        @if (ViewData["Action"].ToString() == "EditChatGroup")
+        {
+            <h4>@localizer["EditChatGroup"]</h4>
+        }
+        else
+        {
+            <h4>@localizer["CreateNewChatGroup"]</h4>
+        }
+        <hr />
+        @*@Html.HiddenFor(n => n.UserIsModerator)
+        @Html.HiddenFor(n => n.GroupId)*@
+
+        @Html.HiddenFor(n => n.AdminId)
+
+        <div class="form-group">
+            <label class="col-lg-2 col-form-label">@localizer["Name"]</label>
+            <div class="col-md-10">
+                <input asp-for="Name" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 col-form-label-lg">@localizer["AvatarURL"]</label>
+            <div class="col-md-11">
+                <input asp-for="AvatarURL" />
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th> @localizer["Друг"]</th>
+                    <th> @localizer["Присоеденить"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.UserChat.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.UserChat[i].User.Name @Model.UserChat[i].User.Surname</td>
+                        <td>@Html.CheckBoxFor(m => m.UserChat[i].ConsistInGroupChat)</td>
+                        @Html.HiddenFor(m => m.UserChat[i].UserId)
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+        <div class="form-group">
+            <div class="col-lg-4">
+                <input type="submit" value="@localizer["Save"]" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+</form>

@@ -1,7 +1,11 @@
 ﻿@model Social_network.ViewModels.UserViewModel
 
 @using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
+@inject IViewLocalizer localizer
+
+@{
+    var returnUrl = string.IsNullOrWhiteSpace(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
+}
 
 <table class="table">
     <tr>
@@ -10,30 +14,129 @@
                 <img src="@Model.AvatarURL" width="200" />
             </div>
         </td>
-        <td bgcolor="#D3EDF6" style="padding:20px">
+        <td bgcolor="#D3EDF6" style="padding:0px">
             <div>
-                @Model.Name @Model.Surname<br style="padding:20px">
-                @Localizer["BirthDate"] : @Model.BirthDate.ToString("d")<br style="padding:20px">
-                @Localizer["PhoneNumber"] : @Model.PhoneNumber<br>
-                @Localizer["Notes"] : @Model.Notes<br />
+                <table>
+                    <tr>
+                        <td style="padding:5px">
+                            @localizer["UserName"] 
+                        </td>
+                        <td style="padding:5px">
+                            @Model.Name @Model.Surname<br style="padding:20px">
+                        </td>
+                    <tr />
+                    <tr>
+                        <td style="padding:5px">
+                                @localizer["BirthDate"]
+                        </td>
+                        <td style="padding:5px">
+                                @Model.BirthDate.ToString("d")<br style="padding:20px">
+                        </td>
+                    <tr />
+                    <tr>
+                        <td style="padding:5px">
+                            @localizer["PhoneNumber"]
+                        </td>
+                        <td style="padding:5px">
+                            @if(Model.pageAccess.AccessSeeMyPhone)
+                            {
+                              @Model.PhoneNumber<br>
+                            }else
+                            {
+                                <p>⚠hidden by privacy settings</p>
+                            }
+                        </td>
+                    <tr />
+                    @if(true){ //fr
+                        <tr>
+                            <td style="padding:5px">
+                                @localizer["Friends"]
+                            </td>
+                            <td style="padding:5px">
+                                @if (Model.pageAccess.AccessSeeMyFriends)
+                                {
+                                     <a asp-controller="User" asp-action="UserFriends" asp-route-userPageId="@Model.Id"> Show friends</a>
+                                }
+                                else
+                                {
+                                     <p>⚠hidden by privacy settings</p>
+                                }
+                                
+                            </td>
+                        </tr>
+                    } 
+                    @if(true){ //gr
+                        <tr>
+                            <td style="padding:5px">
+                                @localizer["Groups"]
+                            </td>
+                            <td style="padding:5px">
+                                <a asp-controller="User" asp-action="UserGroups" asp-route-userPageId="@Model.Id"> Show groups</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="padding:5px">
+                            @localizer["Actions"]
+                        </td>
+                        <td style="padding:5px">
+                            @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
+                                {
+                                    <a asp-controller="User" asp-action="EditMyInformation" asp-route-id="@Model.Id">@localizer["EditMyInformation"]</a>
+                                }
+                            else
+                            {
+                                @if (Model.friendshipStatus == 0)
+                                {
+                                    <a asp-controller="Friends" asp-route-userToAddId="@Model.Id" asp-route-returnUrl="@returnUrl" asp-action="AddFriend">  @localizer["SendRequestToFriendship"] </a>
+                                }
+                                @if (Model.friendshipStatus == 1)
+                                {
+                                    <a asp-controller="Friends" asp-route-UserRequest="@Model.Id" asp-route-returnUrl="@returnUrl" asp-action="CancelSendFriendship">  @localizer["CancelRequestToFrienship"] </a>
+                                }
+                                 @if (Model.friendshipStatus == 2)
+                                {
+                                    <a asp-controller="Friends" asp-route-userToDeleteId="@Model.Id" asp-route-returnUrl="@returnUrl" asp-action="DeleteFriend">  @localizer["RemoveFromFriends"] </a>
+                                }
+                                 @if (Model.friendshipStatus == 3)
+                                {
+                                    <a asp-controller="Friends" asp-route-UserRequest="@Model.Id" asp-route-returnUrl="@returnUrl" asp-action="CancelRequestFriendship">  @localizer["CancelRequest"] </a> @(" | ")
+                                    <a asp-controller="Friends" asp-route-UserRequest="@Model.Id" asp-route-returnUrl="@returnUrl" asp-action="AcceptNewFriend">  @localizer["AcceptRequest"] </a>
+                                }
+                                <br /><br />
 
-                @if(User.Identity.Name == Model.Email || User.IsInRole("Admin"))
-                {
-                <a class="nav-link text-dark, border-dark" asp-controller="User" asp-action="EditMyInformation" asp-route-id="@Model.Id">@Localizer["EditMyInformation"]</a>
-                }
+                                <form asp-controller="Chat" asp-action="CreateOrChooseChat" method="post" asp-route-foreignUserId="@Model.Id">
+                                    <button class="favorite styled" type="button" onclick="this.form.submit();">@localizer["SendSms"]</button>
+                                </form>
+                            }
+                        </td>
+                    <tr />
+                    <tr>
+                        <td style="padding:5px">
+                            @localizer["Notes"]
+                        </td>
+                        <td style="padding:5px">
+                            @Model.Notes<br />
+                        </td>
+                    </tr>
+                </table>
+                
             </div>
         </td>
+        
     </tr>
 </table>
+
+
 <nav>
     @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
     {
     <form asp-action="Send">
 
         @Html.HiddenFor(m => Model.Id)
-        @Localizer["PublishTheNews"]:
+        @localizer["PublishTheNews"]:
         <input type="text" asp-for="NewPost.Text" />
-        <input type="submit" value="@Localizer["SendPost"]"class="btn btn-primary" />
+        <input type="submit" value="@localizer["SendPost"]"class="btn btn-primary" />
     </form>
     }
     @foreach (var post in Model.Posts)
@@ -43,10 +146,12 @@
 
             @if (User.Identity.Name == Model.Email || User.IsInRole("Admin"))
             {
-                @Html.ActionLink($"{Localizer["DeletePost"].Value}", "DeletePost", new { PostId = post.Id })
+                @Html.ActionLink($"{localizer["DeletePost"].Value}", "DeletePost", new { PostId = post.Id })
             }
-            <div style="border: solid; padding:10px">
-                @post.Text
+            <div class="UserPosts">
+                <div class="WithTransfers">
+                    @post.Text      
+                </div>
             </div>
         </nav><br />
     }

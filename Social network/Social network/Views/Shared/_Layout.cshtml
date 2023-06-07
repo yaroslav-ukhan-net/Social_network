@@ -11,10 +11,11 @@
     <title> @localizer["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/MyStyles.css" />
 </head>
 <body>
-    <header style="background-color: #e3f2fd;">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <header style="background-color: #e3f2fd;" >
+        <nav  class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="User" asp-action="MyPage">@localizer["Title"]</a>
                 <a class="nav-link">
@@ -26,68 +27,68 @@
                 </button>
                 @if (User.Identity.IsAuthenticated)
                 {
-    <div class="navbar-text collapse d-sm-inline-flex justify-content-between">
-        <ul class="navbar-nav flex-grow-1 text-lg-right" text-align="right">
-            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Security" asp-action="Logout">@localizer["Logout"]</a></li>
-            <li><p>@User.Identity.Name</p></li>
-        </ul>
-    </div>}
+                    <div class="navbar-text collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1 text-lg-right" text-align="right">
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Security" asp-action="Logout">@localizer["Logout"]</a></li>
+                            <li><p>@User.Identity.Name</p></li>
+                        </ul>
+                    </div>}
             </div>
         </nav>
     </header>
     <div class="container">
         @if (User.Identity.IsAuthenticated)
         {
-<main role="main" class="pb-3">
-    <div class="form-horizontal">
+            <main role="main" class="pb-3">
+                <div class="form-horizontal">
 
-        <div class="container">
-            <table border-collapse="collaps">
-                <tr>
-                    <td class="align-top">
-                        <table class="table table-bordered" style="border-collapse:separate">
+                    <div class="container">
+                        <table border-collapse="collaps">
+                            <tr>
+                                <td class="align-top">
+                                    <table class="table table-bordered" style="border-collapse:separate">
 
-                            <tr>
-                                <td bgcolor="#D3EDF6" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="User" asp-action="MyPage">@localizer["MainPage"]</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="User" asp-action="??????">{Empty}</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="User" asp-action="??????">@localizer["MessagePage"]</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups">@localizer["GroupPage"]</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="alert-dark" style="padding:0px">
-                                    <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">@localizer["FriendsPage"]</a>
-                                </td>
-                            </tr>
+                                        <tr>
+                                            <td bgcolor="#D3EDF6" style="padding:0px">
+                                                <a class="nav-link text-dark" asp-controller="User" asp-action="MyPage">@localizer["MainPage"]</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="alert-dark" style="padding:0px">
+                                                <a class="nav-link text-dark" asp-controller="Settings" asp-action="Privacy">@localizer["Privacy"]</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="alert-dark" style="padding:0px">
+                                                <a class="nav-link text-dark" asp-controller="Chat" asp-action="AllChats">@localizer["MessagePage"]</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="alert-dark" style="padding:0px">
+                                                <a class="nav-link text-dark" asp-controller="Group" asp-action="MyGroups">@localizer["GroupPage"]</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="alert-dark" style="padding:0px">
+                                                <a class="nav-link text-dark" asp-controller="Friends" asp-action="DoingsWithFriends">@localizer["FriendsPage"]</a>
+                                            </td>
+                                        </tr>
 
+                                    </table>
+                                </td>
+                                <td width="100%" style="vertical-align:top">
+                                    @RenderBody()
+                                </td>
+                            </tr>
                         </table>
-                    </td>
-                    <td width="100%" style="vertical-align:top">
-                        @RenderBody()
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-</main> }
-else
-{
-<main>
-    @RenderBody()
-</main>}
+                    </div>
+                </div>
+            </main> }
+        else
+        {
+            <main>
+                @RenderBody()
+            </main>}
     </div>
 
     <footer class="border-top footer text-muted">

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Models
+namespace SocialNetwork.ViewModels
 {
-    public class Message
+    public class MessageViewModel
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
+        public string EmailSender { get; set; }
         public string Text { get; set; }
         public int IdSender { get; set; }
         public int ChatId { get; set; }
@@ -17,5 +17,7 @@ namespace Models.Models
         public bool WithAnswer { get; set; }
         public string AnswerText { get; set; }
         public bool Edited { get; set; }
+        public string MessageSenderName { get; set; }
+        public string MessageSenderAvatar { get; set; }
     }
 }

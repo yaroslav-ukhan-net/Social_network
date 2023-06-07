@@ -27,19 +27,17 @@ namespace Data_SocialNetwork.EF
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Friend>().HasKey(x => new { x.FirstFriendId, x.SecondFriendId });
-
             builder.Entity<Friend>()
               .HasOne(f => f.FirstFriend)
               .WithMany(mu => mu.FirstFriends)
               .HasForeignKey(f => f.FirstFriendId);
-
             builder.Entity<Friend>()
                 .HasOne(f => f.SecondFriend)
                 .WithMany(mu => mu.SecondFriends)
                 .HasForeignKey(f => f.SecondFriendId);
 
-            builder.Entity<UserGroup>()
-                .HasKey(bc => new { bc.UserId, bc.GroupId });
+
+            builder.Entity<UserGroup>().HasKey(bc => new { bc.UserId, bc.GroupId });
             builder.Entity<UserGroup>()
                 .HasOne(ug => ug.User)
                 .WithMany(u => u.UserGroup)
@@ -50,12 +48,24 @@ namespace Data_SocialNetwork.EF
                 .HasForeignKey(ug => ug.GroupId);
 
 
+            builder.Entity<UserChat>().HasKey(bc => new { bc.UserId, bc.ChatId });
+            builder.Entity<UserChat>()
+                .HasOne(ug => ug.User)
+                .WithMany(u => u.UserChat)
+                .HasForeignKey(ug => ug.UserId);
+            builder.Entity<UserChat>()
+                .HasOne(ug => ug.Chat)
+                .WithMany(g => g.UserChat)
+                .HasForeignKey(ug => ug.ChatId);
+
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Friend> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<UserGroup> UserGroup { get; set; }
-        
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Setting> Settings { get;set; }
     }
 }
