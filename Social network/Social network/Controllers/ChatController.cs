@@ -107,7 +107,7 @@ namespace SocialNetwork.Controllers
 
             return RedirectToAction("ChatWithUser", new { id = idChat });
         }
-        public IActionResult ChatWithUser(int id)
+        public IActionResult ChatWithUser(int id, int? pageMessage)
         {
             int userId = _UserManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId != 0 ?
                 userId = _UserManager.Users.SingleOrDefault(id => id.Email == User.Identity.Name).AppUserId : throw new NullReferenceException();
@@ -137,7 +137,7 @@ namespace SocialNetwork.Controllers
                 }
             }
 
-            foreach (var m in ch.Messages)
+            /*foreach (var m in ch.Messages)
             {
                 chatsViewModel.Messages.Add(new()
                 {
@@ -155,9 +155,57 @@ namespace SocialNetwork.Controllers
                     EmailSender = _UserService.GetUserById(m.IdSender).Email
                 });
             }
+            */
 
-            return View(chatsViewModel);
+            int nextPageMessage = pageMessage ?? 0;
+            ChatsViewModel modelForChecking = GetItemsPage(chatsViewModel, ch, nextPageMessage);
+            
+
+            if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest") //is ajax
+            {
+                if (modelForChecking.Messages.Count == 0)
+                {
+                    return PartialView(BadRequest()); // ajax не подружать если данные закончились
+                }
+                else
+                {
+                    return PartialView("_Items", GetItemsPage(chatsViewModel, ch, nextPageMessage));// ajax подгрузка
+                }
+            }
+
+            return View(GetItemsPage(chatsViewModel, ch, nextPageMessage)); //загрузка страницы
         }
+
+        private ChatsViewModel GetItemsPage(ChatsViewModel model, Chat chat, int page = 1)
+        {
+            var itemsToSkip = page * 10;
+
+            var listMes = chat.Messages.OrderBy(t => t.Id).Skip(itemsToSkip).Take(10).ToList();
+            foreach(var m in listMes)
+            {
+                model.Messages.Add(new()
+                {
+                    AnswerText = m.AnswerText,
+                    Date = m.Date,
+                    Edited = m.Edited,
+                    Id = m.Id,
+                    IdSender = m.IdSender,
+                    IsVisible = m.IsVisible,
+                    Text = m.Text,
+                    WithAnswer = m.WithAnswer,
+                    ChatId = m.ChatId,
+                    MessageSenderAvatar = _UserService.GetUserById(m.IdSender).AvatarURL,
+                    MessageSenderName = _UserService.GetUserById(m.IdSender).Name + " " + _UserService.GetUserById(m.IdSender).Surname,
+                    EmailSender = _UserService.GetUserById(m.IdSender).Email
+                });
+            }
+               
+            return model;
+        }
+
+
+
+
         [HttpGet]
         public IActionResult CreateChatGroup()
         {

@@ -76,6 +76,8 @@ namespace Social_network.Controllers
             var userPage = _userService.GetUserById(id);
             if (userPage == null) return NotFound();
 
+
+
             UserViewModel model = new()
             {
                 Id = id,

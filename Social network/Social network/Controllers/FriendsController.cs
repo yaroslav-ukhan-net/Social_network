@@ -26,6 +26,7 @@ namespace Social_network.Controllers
             _userManager = userManager;
         }
 
+
         //Get:Friends/СonfirmedFriends/
         [HttpGet]
         public IActionResult DoingsWithFriends()
@@ -42,7 +43,6 @@ namespace Social_network.Controllers
             model.Surname = userMain.Surname;
             model.AvatarURL = userMain.AvatarURL;
             model.FriendsListForModel = new();
-
 
             var userFirstInFrienship = _friendService.GetAllFriendsQuerible(c =>
                ((c.Status == (int)StatusFriendship.areFriends) &&

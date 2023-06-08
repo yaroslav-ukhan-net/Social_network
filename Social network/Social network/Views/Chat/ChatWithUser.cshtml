@@ -8,63 +8,10 @@
     @Html.ActionLink("All participants", "AllParticipants", "Chat", new { idChat = Model.Id})
 </div>
 
-<table class="table">
-    <tbody id="tbd">
-        @for (var i = 0; i < Model.Messages.Count; i++)
-        {
-            <tr id="@Model.Messages[i].Id">
 
-                <td  style="
-    padding-top: 0px;
-    padding-left: 10px;
-    padding-right: 0px;
-    padding-bottom: 0px;
-">
-                    @if (Model.Messages[i].WithAnswer)
-                    {
-                        <i style="color: #128DFF ">↳@@@Model.Messages[i].AnswerText</i>
-                    }
-                    <p>
-                        <img src="@Model.Messages[i].MessageSenderAvatar" width="15" />
-                        @Model.Messages[i].MessageSenderName
-                        @if (Model.Messages[i].Edited)
-                        {
-                            <sub>
-                                (✎ред.)
-                            </sub>
-                        }
-                        <sub>(@Model.Messages[i].Date.ToString("g"))</sub> : @Model.Messages[i].Text
-                    </p>
-                </td>
-
-                <td width="190" style="padding:0px">
-                    @if (Model.Messages[i].EmailSender == User.Identity.Name)
-                    {
-                        <i>
-                            @Html.ActionLink("Edit", "Edit", "Chat", new { IdChat = Model.Id, Id = Model.Messages[i].Id })
-                        </i><br />
-                        <i>
-                            Delete (
-                            @Html.ActionLink("for me/", "DeleteMe", "Chat", new { IdChat = Model.Id, Id = Model.Messages[i].Id })
-                            <input type="button" onclick="RemoveRowId(@Model.Messages[i].Id)" value="for all" />
-                            )
-                        </i><br />
-                    }
-                    @if (Model.IsGroup)
-                    {
-                        <i>
-                            Answer (
-                            @Html.ActionLink("Private/", "Answer_for_message", "Chat", new { IdChat = Model.Messages[i].IdSender, Id = Model.Messages[i].Id })
-                            @Html.ActionLink("Here", "Answer_for_message", "Chat", new { IdChat = Model.Id, Id = Model.Messages[i].Id })
-                            )
-                        </i>
-                    }
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="scrolList">
+    @Html.Partial("_Items")
+</div>
 
 <div class="container">
     <div class="row">&nbsp;</div>
@@ -98,5 +45,6 @@
         <ul id="messagesList"></ul>
     </div>
 </div>
+<script type="text/javascript" src="~/js/ScrollingInfinite.js"></script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
